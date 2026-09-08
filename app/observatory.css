@@ -181,3 +181,18 @@
 @media(max-width:640px){.atlas:not(.odyssey) .chamber{padding-bottom:12px}.atlas:not(.odyssey) .chamber>.time-panel{padding-top:48px;padding-bottom:30px}.atlas .time-panel .timeline-foot{padding:0 7px}.atlas .time-panel .play-button:after{inset:-12px}}
 @media(prefers-reduced-motion:reduce){.atlas .time-panel[data-playing=true] .play-button:after{animation:none}}
 @media(min-width:641px){.atlas:not(.odyssey) .chamber>.time-panel{padding-top:58px;padding-bottom:17px}}
+/* A quiet violet starfield within the observation aperture. */
+.atlas:not(.odyssey) .chamber:after{background:radial-gradient(ellipse at 47% 38%,#6b438321 0,transparent 36%),radial-gradient(ellipse at 65% 43%,#65498416 0,transparent 28%),radial-gradient(ellipse at 30% 47%,#3e436d18 0,transparent 31%),linear-gradient(180deg,#03080b33,transparent 13%,transparent 65%,#040a0f55 77%,#030a1099)}
+.atlas:not(.odyssey) .chamber>.workspace:before{inset:0 -3%;border:0;border-radius:0;box-shadow:none;background-image:radial-gradient(circle at 13% 27%,#e0d3edb3 0 .6px,transparent 1.5px),radial-gradient(circle at 32% 15%,#ccbef780 0 .5px,transparent 1.4px),radial-gradient(circle at 71% 19%,#d2d5f0a3 0 .7px,transparent 1.6px),radial-gradient(circle at 87% 59%,#e8e0f78a 0 .5px,transparent 1.4px),radial-gradient(circle at 62% 83%,#d6c5f37a 0 .6px,transparent 1.5px),radial-gradient(circle at 24% 77%,#b1bbdd8a 0 .5px,transparent 1.4px),radial-gradient(circle at 75% 65%,#e4d7ff80 0 .5px,transparent 1.4px);pointer-events:none;opacity:.85}
+.atlas.odyssey:after{background:radial-gradient(ellipse at 35% 37%,#69438224,transparent 38%),radial-gradient(ellipse at 56% 49%,#51548416,transparent 27%),linear-gradient(180deg,transparent,#03090d33 12%,transparent 55%,#030a1199 75%,#030a11e6)}
+/* Navigation is recessed into a single rail beneath the upper arch. */
+.atlas .topbar nav{position:relative;isolation:isolate;gap:0;padding:0 14px;height:49px;align-self:center;border:1px solid #b7c3b929;border-top-color:#e1ddc742;border-radius:14px 14px 38px 38px / 10px 10px 20px 20px;background:linear-gradient(180deg,#020608a8,#18212663 55%,#93aaa412);box-shadow:inset 0 2px 7px #000b,inset 0 -1px 0 #d5e2d728,0 2px 0 #03070ad9,0 3px 0 #b7c2b719;backdrop-filter:blur(12px)}
+.atlas .topbar nav>a,.atlas .topbar nav>button{height:100%;padding:0 clamp(12px,1.25vw,24px);display:flex;align-items:center;justify-content:center;gap:8px;position:relative;white-space:nowrap;font-size:inherit}
+.atlas .topbar nav>*+*{border-left:1px solid #bacbc210}
+.atlas .topbar nav .active{background:radial-gradient(ellipse at 50% 100%,#b9cfcc18,transparent 75%);color:#e4ece5}
+.atlas .topbar nav .active:after{content:'';position:absolute;left:20%;right:20%;bottom:0;height:1px;background:linear-gradient(90deg,transparent,#e5dbc0,transparent);box-shadow:0 -2px 12px #d6d2b94d}
+.atlas .topbar nav>a:hover,.atlas .topbar nav>button:hover{background:linear-gradient(180deg,transparent,#b6c8c010)}
+@media(max-width:1250px){.atlas .topbar nav{padding:0 6px}.atlas .topbar nav>a,.atlas .topbar nav>button{padding:0 10px}}
+@media(max-width:640px){.atlas:not(.odyssey) .chamber>.topbar nav,.atlas.odyssey .topbar nav{height:36px;padding:0 7px;border-radius:9px 9px 20px 20px / 7px 7px 12px 12px}.atlas .topbar nav>a,.atlas .topbar nav>button{padding:0 9px;font-size:11px}.atlas:not(.odyssey) .chamber>.workspace:before{inset:190px 0 30px}}
+.atlas .topbar .search-button{white-space:nowrap;flex-shrink:0}
+@media(max-width:1450px){.atlas .topbar .brand-note{display:none}}
