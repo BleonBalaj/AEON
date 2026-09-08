@@ -4,7 +4,7 @@ Checked against the original attachment on 2026-09-07. This audit distinguishes 
 
 ## 2026-09-08 refinement evidence
 
-User authorized rendered testing and requested a refined futuristic observatory surface while retaining typography, plus a separate Human Odyssey storyline. Implemented `/human-odyssey` with six chapters, chapter-specific routes, auto-advancing demo, pause/restart/steps, keyboard scrubber, camera focus and evidence sheets. Original human layers and playback remain in `/`. Surface styling preserves the original Geist body and Georgia emphasis. Missing reconstruction rasters now hide the planet rather than displaying an incorrect prior epoch.
+User authorized rendered testing and requested a refined futuristic observatory surface while retaining typography, plus a separate Human Odyssey storyline. Implemented `/human-odyssey` with six chapters, chapter-specific routes, auto-advancing demo, pause/restart/steps, keyboard scrubber, camera focus and evidence sheets. Later user feedback superseded this: human exploration is isolated in Human Odyssey. Surface styling preserves the original Geist body and Georgia emphasis. The later loading fix retains the last complete surface, reports loading and pauses timeline playback while the new reconstruction loads.
 
 Browser checks: desktop 1280×800 and 1440×1000, phone 390×844; no horizontal overflow at inspected sizes; main context ends at y485 and timeline begins y566 at 1280×800. Switches are 24×14 rather than stretched. Human playback visibly advanced from 300 ka to ~172 ka; chapter selection, End-key scrubbing, Sahul and Pacific evidence sheets were exercised. Rendered Earth imagery, route stage and mobile stacking inspected. Search matching was tightened after the browser revealed irrelevant fuzzy matches. These checks do not prove exhaustive accessibility, device performance or the remaining scientific requirements below.
 
@@ -44,7 +44,7 @@ Browser checks: desktop 1280×800 and 1440×1000, phone 390×844; no horizontal 
 
 ## Current publication
 
-Private version 6 is the last confirmed publication before this audit update. New changes are pending publication. A deployment success proves delivery, not visual or scientific completeness.
+Private version 8 is the last confirmed publication before this audit update. It includes the engraved brand and verified chapter-panel scroll reset. New scientific-context changes are pending publication. A deployment success proves delivery, not visual or scientific completeness.
 
 ## Next priorities
 
@@ -57,3 +57,8 @@ Private version 6 is the last confirmed publication before this audit update. Ne
 ## Latest focused checks
 
 Early Earth previously reused almost unchanged terrain above 540 Ma. Geometry, bare-rock treatment and cooling-stage clouds now vary with age, explicitly as illustration. Desktop browser snapshots checked 4540, 4400, 3800, 1800, 700 and 650 Ma; the nonglacial Cryogenian interval visibly differs from glacial coverage. No browser console errors in that check. Human Story Atlas search, selection of the Indus civilization and its evidence source were verified through the UI. This does not establish full scientific or physical-device completeness.
+
+
+## Scientific-context regression pass — 2026-09-09
+
+Shared Cryogenian ice timing now drives the renderer instead of duplicating GLSL dates. Environment labels distinguish Sturtian, nonglacial interval and Marinoan. Two sourced chapters explain the interval and later freeze. Precambrian comparison copy explicitly distinguishes illustrations from PaleoDEM reconstructions. Earth-only biosphere descriptions replace the residual hominin narrative; Human Odyssey retains human content. Holocene environmental classification uses the same 11.7 ka boundary as the geological hierarchy. Automated checks cover ice at 700/680/640/638 Ma, no ice in the modeled interval, label agreement, and the Earth-only biosphere invariant. Earlier table rows describe the baseline and must be interpreted with the dated refinements above; they are not a claim of current full completion.
