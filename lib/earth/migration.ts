@@ -15,6 +15,7 @@ export const routes:Route[]=[
 {id:'america',name:'Americas · route uncertain',from:[65,-165],to:[33,-116],start:.026,end:.021,range:'Presence by 23–21 ka; route uncertain'},
 {id:'south-america',name:'South America',from:[33,-116],to:[-30,-72],start:.02,end:.0145,range:'By at least ~14.5 ka; earlier evidence debated'},
 {id:'pacific-west',name:'Remote Oceania',from:[-6,145],to:[-18,178],start:.0033,end:.0028,range:'~3.3–2.8 ka'},
-{id:'pacific-east',name:'Eastern Polynesia',from:[-18,178],to:[-17,-150],start:.0013,end:.0008,range:'~1.3–0.8 ka; varies by archipelago'}
+{id:'pacific-east',name:'Eastern Polynesia',from:[-18,178],to:[-17,-150],start:.0011,end:.0008,range:'~1.1–0.8 ka; varies by archipelago'}
 ];
 export const hominins=[{name:'Australopithecus afarensis',start:3.85,end:2.95,points:[[9,40],[-3,35]],color:'#c8bd8f'},{name:'Homo habilis',start:2.4,end:1.4,points:[[-3,35],[-26,28]],color:'#d7b581'},{name:'Homo erectus',start:1.89,end:.11,points:[[4,36],[42,44],[-7,110]],color:'#dcac7e'},{name:'Neanderthals',start:.4,end:.04,points:[[48,7],[35,45],[51,85]],color:'#e1b698'},{name:'Denisovan-related',start:.2,end:.05,points:[[51,85],[35,103],[24,120]],color:'#b2a4d1'},{name:'Homo sapiens',start:.3,end:0,points:[[31,-8],[9,40],[-28,26]],color:'#bce1ca'}] as const;
+

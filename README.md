@@ -40,9 +40,16 @@ To regenerate rasters, obtain the CSV archive from https://www.earthbyte.org/pal
 
 ## Validation
 
+The separate `/human-odyssey` route presents six guided chapters from African origins through Remote Oceania. Each chapter has its own time window, camera focus, route filter, playback/scrubbing, and evidence sheet. Its animations reuse the atlas's schematic migration dataset; they are not population simulations. Human layers and migration playback remain in the main explorer. The observatory surface refresh keeps the original Geist/Georgia typography.
+
 - TypeScript and production build passed during development.
 - Automated tests cover 4,005 round-trip positions across five timeline scales, geological boundaries including K–Pg, all source references, all 109 raster dimensions, known land/ocean coordinate orientation, distinct Pangaea geography and source-backed sea-level anchors.
 - Browser WebMCP contract verified for navigation to 280 Ma, 21 ka and present; invalid negative time rejected without altering state. No runtime errors reported in that check.
-- Full screenshot-based visual QA and exhaustive pointer/touch/browser-device testing were not performed. The bundled Sites skill reserves these for explicit browser-testing requests.
+- With explicit user authorization, desktop and phone-sized browser rendering, chapter selection, guided playback, keyboard scrubbing, evidence sheets and overflow were checked. This is representative browser QA, not exhaustive physical-device testing.
 
 Optional browser agent tools are feature-detected through `document.modelContext`; unsupported browsers retain the complete visible interface.
+
+
+## Reference-led observation chamber
+
+The revised shell places navigation, the live globe and time controls inside one continuous instrument. The freestanding header/chapter shelf were removed from the main composition after user review. The same materials apply to Human Odyssey. The generated architectural asset is `public/art/observatory-chamber.png`; it contains no globe, text or controls, which remain interactive. Created with the built-in image generation tool using this final prompt: "Front-facing refined alien observatory architectural frame; flowing dark platinum and smoked bronze metal, soft champagne illuminated seams, empty near-black central aperture for a live globe and readable side text; sculpted top arch and lower desk; no planets, text, labels, UI or controls." CSS reduces saturation and brightness for readability. Original fonts are retained.

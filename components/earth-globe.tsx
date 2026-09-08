@@ -6,7 +6,7 @@ import {routes,hominins} from '@/lib/earth/migration';
 import {events,EarthEvent,seaLevel} from '@/lib/earth/history';
 export type Layers={clouds:boolean;plates:boolean;climate:boolean;ice:boolean;life:boolean;humans:boolean;migration:boolean;civilization:boolean;grid:boolean};
 export type GlobeApi={zoom:(factor:number)=>void;reset:()=>void;focus:(lat:number,lon:number)=>void};
-type Props={age:number;layers:Layers;selected:EarthEvent|null;onSelect:(e:EarthEvent)=>void;onReady:(api:GlobeApi)=>void;autoRotate:boolean;onStatus:(s:string)=>void};
+type Props={age:number;layers:Layers;selected:EarthEvent|null;onSelect:(e:EarthEvent)=>void;onReady:(api:GlobeApi)=>void;autoRotate:boolean;onStatus:(s:string)=>void;routeIds?:string[]};
 const vertex=`varying vec2 vUv;varying vec3 vN;varying vec3 vP;varying vec3 vV;void main(){vUv=uv;vP=position;vN=normalize(normalMatrix*normal);vec4 p=modelViewMatrix*vec4(position,1.);vV=-p.xyz;gl_Position=projectionMatrix*p;}`;
 const fragment=`
 precision highp float;
@@ -62,7 +62,7 @@ export default function Globe(props:Props){
  for(let i=0;i<starArray.length;i+=3){const v=xyz(rand()*180-90,rand()*360-180,12);starArray.set(v.toArray(),i);}
  const starGeometry=new THREE.BufferGeometry();starGeometry.setAttribute('position',new THREE.BufferAttribute(starArray,3));const stars=new THREE.Points(starGeometry,new THREE.PointsMaterial({color:'#93b3bf',size:.014,transparent:true,opacity:.48}));scene.add(stars);
  const texCache=new Map<number,THREE.Texture>(),pending=new Set<number>();const loader=new THREE.TextureLoader();let requestKey='';let earthLoaded=false;let lastLoading=false;let textureFailure=false;
- function loadGrid(age:number){if(texCache.has(age)||pending.has(age))return;pending.add(age);loader.load(`/paleo/${age}.png`,tex=>{pending.delete(age);if(!alive){tex.dispose();return;}tex.minFilter=THREE.LinearFilter;tex.magFilter=THREE.LinearFilter;tex.generateMipmaps=false;texCache.set(age,tex);if(texCache.size>10){for(const [key,t]of texCache){if(key!==0&&key!==age&&t!==uniforms.mapA.value&&t!==uniforms.mapB.value){t.dispose();texCache.delete(key);break;}}}},undefined,()=>{pending.delete(age);textureFailure=true;if(alive)current.current.onStatus('Reconstruction could not load. Select another chapter or reload.');});}
+ function loadGrid(age:number){if(texCache.has(age)||pending.has(age))return;pending.add(age);loader.load(`/paleo/${age}.png`,tex=>{pending.delete(age);if(!alive){tex.dispose();return;}tex.minFilter=THREE.LinearFilter;tex.magFilter=THREE.LinearFilter;tex.generateMipmaps=false;texCache.set(age,tex);if(texCache.size>10){for(const [key,t]of texCache){if(key!==0&&key!==age&&t!==uniforms.mapA.value&&t!==uniforms.mapB.value){t.dispose();texCache.delete(key);break;}}}},undefined,()=>{pending.delete(age);textureFailure=true;if(alive){current.current.onStatus('Reconstruction unavailable; no substitute geography is shown.');setError('This scientific reconstruction could not load. Choose another chapter or reload the globe.');}});}
  loader.load('/textures/earth.webp',tex=>{if(!alive){tex.dispose();return;}tex.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());uniforms.earth.value=tex;earthLoaded=true;setLoaded(true);},undefined,()=>{if(alive){setLoaded(true);current.current.onStatus('NASA imagery unavailable; showing elevation-derived Earth.');}});loadGrid(0);
  const plates=new THREE.Group();scene.add(plates);let plateFail=false;
  const abort=new AbortController();fetch('/plates.json',{signal:abort.signal}).then(r=>{if(!r.ok)throw Error();return r.json();}).then(data=>{if(!alive)return;const vertices:number[]=[];for(const f of (data as {features:{geometry:{type:string;coordinates:number[][]}}[]}).features){if(f.geometry.type!=='LineString')continue;const pts=f.geometry.coordinates;for(let i=1;i<pts.length;i++)vertices.push(...xyz(pts[i-1][1],pts[i-1][0],1.004).toArray(),...xyz(pts[i][1],pts[i][0],1.004).toArray());}const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));plates.add(new THREE.LineSegments(g,new THREE.LineBasicMaterial({color:'#edbb7e',transparent:true,opacity:.7})));}).catch(()=>{plateFail=true;});
@@ -78,12 +78,15 @@ export default function Globe(props:Props){
  let frame=0,last=0;function animate(now:number){if(!alive)return;frame=requestAnimationFrame(animate);if(document.hidden||now-last<24)return;last=now;
  const {age,layers,selected,autoRotate}=current.current;uniforms.age.value=age;uniforms.seaLevel.value=seaLevel(age);uniforms.clouds.value=+layers.clouds;uniforms.climate.value=+layers.climate;uniforms.ice.value=+layers.ice;uniforms.grid.value=+layers.grid;uniforms.tick.value=reduced?0:now/1000;air.visible=age<4400&&layers.clouds;
  const a=age>.12&&age<=540?Math.floor(age/5)*5:0;const b=age>.12&&age<=540?Math.min(540,a+5):0;const key=`${a}:${b}`;
- if(key!==requestKey){requestKey=key;textureFailure=false;loadGrid(a);loadGrid(b);}
+ if(key!==requestKey){requestKey=key;textureFailure=false;setError('');loadGrid(a);loadGrid(b);}
  if(texCache.has(a)&&texCache.has(b)){uniforms.mapA.value=texCache.get(a)!;uniforms.mapB.value=texCache.get(b)!;uniforms.blend.value=a===b?0:(age-a)/(b-a);if(lastLoading){current.current.onStatus('');lastLoading=false;}}
  else if(!textureFailure){if(!lastLoading){current.current.onStatus('Loading scientific reconstruction…');lastLoading=true;}}
+ // Do not display a previous epoch's surface beneath the newly selected date.
+ planet.visible=age>540||(texCache.has(a)&&texCache.has(b))||(age===0&&earthLoaded);
+ air.visible=planet.visible&&age<4400&&layers.clouds;
  uniforms.modern.value=age<=.12&&earthLoaded?1:0;
  plates.visible=layers.plates&&age<=.3;if(plateFail&&plates.visible)current.current.onStatus('Plate boundaries could not load.');
- migration.visible=layers.migration&&age<=.3;for(const {route,line}of routeLines){const progress=THREE.MathUtils.clamp((route.start-age)/(route.start-route.end),0,1);line.visible=progress>0;line.geometry.setDrawRange(0,Math.max(2,Math.floor(progress*101)));}
+ migration.visible=layers.migration&&age<=.3;for(const {route,line}of routeLines){const progress=THREE.MathUtils.clamp((route.start-age)/(route.start-route.end),0,1);line.visible=progress>0&&(!current.current.routeIds||current.current.routeIds.includes(route.id));line.geometry.setDrawRange(0,Math.max(2,Math.floor(progress*101)));}
  const dotKey=[Math.round(age*100000),layers.life,layers.humans,layers.civilization,selected?.id].join(':');if(dotKey!==lastDots){lastDots=dotKey;for(const c of dots.children){c.traverse(o=>{if(o instanceof THREE.Mesh&&o.material!==dotMat)(o.material as THREE.Material).dispose();});}dots.clear();clickable.length=0;
  if(layers.humans){for(const h of hominins)if(age<=h.start&&age>=h.end)for(const point of h.points)addPin(point[0],point[1],h.color,events.find(e=>e.title.includes(h.name)||e.keywords?.includes(h.name)));}
  if(layers.civilization&&age<=.012)for(const event of events)if(event.category==='Civilization'&&event.age>=age&&event.location)addPin(...event.location,'#dfc18c',event);
@@ -97,4 +100,5 @@ export default function Globe(props:Props){
  },[retry]);
  return <div className="globe-host" ref={host}>{!loaded&&!error&&<div className="globe-loading"><span/> Bringing Earth into view</div>}{error&&<div className="globe-error"><p>{error}</p><button onClick={()=>{setError('');setRetry(x=>x+1);}}>Reload globe</button></div>}</div>;
 }
+
 
