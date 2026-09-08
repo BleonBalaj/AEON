@@ -149,3 +149,35 @@
 
 .odyssey .odyssey-world .globe-host{inset:-50% -40%;--globe-framing-scale:2;mask-image:radial-gradient(ellipse 43% 30% at 50% 50%,#000 70%,#000d 84%,transparent 100%)}
 .odyssey .odyssey-story{position:relative;z-index:3}
+/* A continuous optical console, shaped around the central transport control. */
+.atlas:not(.odyssey) .chamber>.time-panel{padding:33px 34px 24px;background:none;border:0;border-radius:0;box-shadow:none;backdrop-filter:none;isolation:isolate}
+.atlas:not(.odyssey) .chamber>.time-panel:before{display:none}
+.console-shell{position:absolute;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;filter:drop-shadow(0 -2px 8px #c9e2e20b)}
+.atlas .time-panel .time-head{min-height:64px;margin-bottom:18px;position:relative;align-items:center}
+.atlas .time-panel .timeline-actions{display:contents}
+.atlas .time-panel .scale-picker{margin-left:auto;min-width:155px}
+.atlas .time-panel .play-controls{position:absolute;left:50%;top:0;transform:translateX(-50%);height:64px;gap:20px}
+.atlas .time-panel .play-button{width:54px;height:54px;background:radial-gradient(circle at 40% 25%,#e4e6d2,#b2bfbb 35%,#4b6166 73%,#263b41);border:1px solid #e0e1c887;box-shadow:inset 0 1px 5px #fff9,0 0 0 7px #060b0ddd,0 0 0 8px #c9d6d34d,0 0 0 14px #a3c9cd08,0 0 28px #bbdedd20;color:#0b2027}
+.atlas .time-panel .speed-select{position:absolute;left:calc(100% + 16px);min-width:95px}
+.atlas .time-panel .timeline-track{margin-top:18px;padding-top:9px}
+.atlas .time-panel .timeline-track [data-slot=slider-track]{height:2px!important;background:#bed6d52b;box-shadow:0 1px 0 #020608,0 0 9px #a9d5da15}
+.atlas .time-panel .timeline-track [data-slot=slider-range]{background:linear-gradient(90deg,#728e95,#d8e4d8);box-shadow:0 0 8px #c6e2dc35}
+.atlas .time-panel .timeline-track [data-slot=slider-thumb]{width:9px;height:23px;border-radius:6px;background:#e2e6d6!important;border:1px solid #fbf4d4;box-shadow:0 0 0 5px #c4dad80d,0 0 19px #c0e1df55}
+.atlas .time-panel .eon-strip{margin-top:12px}.atlas .time-panel .eon-strip button{text-align:center;border-top-color:#b8cec62c;padding:6px 9px}
+.atlas .time-panel .timeline-foot{margin-top:9px}.atlas .time-panel .date-block strong{font-size:clamp(21px,1.9vw,31px)}
+@media(max-width:1000px){.atlas .time-panel .play-controls{left:56%;gap:8px}.atlas .time-panel .speed-select{display:none}.atlas .time-panel .scale-picker{min-width:120px}.atlas .time-panel .date-block{max-width:43%}}
+@media(max-width:640px){.atlas:not(.odyssey) .chamber>.time-panel{padding:29px 16px 26px}.console-shell{inset:0 -8px;width:calc(100% + 16px)}.atlas .time-panel .time-head{display:block;min-height:132px;margin-bottom:10px}.atlas .time-panel .date-block{max-width:100%;text-align:center}.atlas .time-panel .date-block .eyebrow{justify-content:center}.atlas .time-panel .play-controls{top:84px;left:50%;height:42px;gap:22px}.atlas .time-panel .play-button{width:40px;height:40px}.atlas .time-panel .scale-picker{position:absolute;top:86px;left:0;min-width:70px}.atlas .time-panel .scale-picker [data-slot=select-trigger]{min-width:70px;max-width:78px;font-size:10px}.atlas .time-panel .timeline-track{margin-top:17px}.atlas .time-panel .timeline-foot{font-size:8px}}
+@media(min-width:641px) and (max-width:1000px){.atlas .time-panel .speed-select{display:flex;left:calc(100% + 8px);top:48px;min-width:76px;font-size:11px}}
+@media(max-width:640px){.atlas .time-panel .speed-select{display:flex;left:calc(100% + 8px);min-width:60px;width:60px;font-size:10px;padding-left:0}}
+/* Keep the readouts inside the sloping glass, with the console seated lower. */
+.atlas:not(.odyssey) .chamber{padding-bottom:.7svh}
+.atlas:not(.odyssey) .chamber>.time-panel{padding-top:50px;padding-bottom:25px}
+.atlas .time-panel .timeline-foot{padding:0 10px}.atlas .time-panel .date-block{padding-left:3px}
+.atlas .time-panel .play-button{position:relative;box-shadow:inset 0 1px 5px #fff9,0 0 0 7px #060b0ddd,0 0 0 8px #c9d6d34d,0 0 0 13px #060e1055,0 0 0 14px #9dbfc31c,0 0 28px #bbdedd20}
+.atlas .time-panel .play-button:after{content:'';position:absolute;inset:-15px;border:1px solid transparent;border-top-color:#d6e8dfaa;border-bottom-color:#95bec56b;border-radius:50%;pointer-events:none;transform:rotate(-32deg)}
+.atlas .time-panel[data-playing=true] .play-button:after{animation:spin 18s linear infinite}
+.atlas .time-panel .scale-picker [data-slot=select-trigger]{border-bottom-color:#a7c4c344;box-shadow:0 1px 0 #02060970}
+.atlas .time-panel .console-shell{filter:drop-shadow(0 -1px 4px #d2e7e51c)}
+@media(max-width:640px){.atlas:not(.odyssey) .chamber{padding-bottom:12px}.atlas:not(.odyssey) .chamber>.time-panel{padding-top:48px;padding-bottom:30px}.atlas .time-panel .timeline-foot{padding:0 7px}.atlas .time-panel .play-button:after{inset:-12px}}
+@media(prefers-reduced-motion:reduce){.atlas .time-panel[data-playing=true] .play-button:after{animation:none}}
+@media(min-width:641px){.atlas:not(.odyssey) .chamber>.time-panel{padding-top:58px;padding-bottom:17px}}
