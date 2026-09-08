@@ -46,7 +46,7 @@ export default function Home(){
  const visibleMarkers=events.filter(e=>e.age<=scales[scale].max).filter((e,i)=>scale===0?featured.includes(e.id):scale===1?e.age>10:scale===2?e.age>.3:scale===3?e.age>.012:true);
  return <main className={`atlas ${started?'exploring':''} ${isExtinction?'extinction-world':''}`}>
  <a className="skip-link" href="#time-control">Skip to timeline</a>
- <div className="chamber"><header className="topbar"><a className="brand" href="/" aria-label="AEON home"><Orbit size={30}/><span>AEON</span></a><span className="brand-note">A LIVING HISTORY<br/>OF EARTH</span><nav aria-label="Main navigation"><button className="active" onClick={()=>setDrawer(null)}>Explore Earth</button><a href="/human-odyssey">Human Odyssey</a><button onClick={()=>setDrawer('eras')}>Era explorer <ArrowUpRight size={14}/></button><button onClick={()=>setDrawer('sources')}>About the atlas</button></nav><button className="search-button" onClick={()=>setSearch(true)} aria-label="Search Earth's history"><Search size={17}/><span>Search history</span><kbd>⌘ K</kbd></button></header>
+ <div className="chamber"><header className="topbar"><a className="brand" href="/" aria-label="AEON home"><Orbit size={30}/><span>AEON</span></a><span className="brand-note">A LIVING HISTORY<br/>OF EARTH</span><nav aria-label="Main navigation"><button className="active" onClick={()=>setDrawer(null)}><Globe2 size={15}/>Explore Earth</button><a href="/human-odyssey"><Users size={15}/>Human Odyssey</a><button onClick={()=>setDrawer('eras')}><Clock3 size={15}/>Era explorer</button><button onClick={()=>setDrawer('sources')}><BookOpen size={15}/>About the atlas</button></nav><button className="search-button" onClick={()=>setSearch(true)} aria-label="Search Earth's history"><Search size={17}/><span>Search history</span><kbd>⌘ K</kbd></button></header>
  <section className="workspace" aria-label="Earth visualization">
  <Globe age={age} layers={layers} selected={selected} onSelect={e=>jump(e,true)} onReady={ready} autoRotate={autoRotate} onStatus={setStatus} onBuffering={onBuffering}/>
  <div className="intro"><div className="eyebrow"><span className="live-dot"/> {started?`${time.eon.toUpperCase()} EON`:'THE STORY OF OUR HOME'}</div><h1>{started?<>{story.title.split(' ').slice(0,3).join(' ')}<br/><em>{story.title.split(' ').slice(3).join(' ')}</em></>:<>One planet.<br/><em>Countless worlds.</em></>}</h1><p>{started?story.description:<>Travel through 4.54 billion years of change.<br/>Every world before us. Every step that led here.</>}</p>{started?<button className="text-link" onClick={openDetails}>Discover this chapter <ArrowUpRight size={16}/></button>:<button className="primary" onClick={startJourney}><Play size={15} fill="currentColor"/> Begin the journey</button>}<div className="intro-foot">{started?formatAge(age).toUpperCase():'THE PAST IS ANOTHER WORLD. EXPLORE IT.'}</div>
@@ -75,6 +75,7 @@ export default function Home(){
  </main>;
 }
 function SourceLinks({ids}:{ids:string[]}){return <ul className="sources-list">{ids.map(id=>sources[id]&&<li key={id}><a href={sources[id].url} target="_blank" rel="noreferrer">{sources[id].name}<ExternalLink size={13}/></a></li>)}</ul>}
+
 
 
 
