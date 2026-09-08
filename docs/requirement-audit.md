@@ -44,11 +44,16 @@ Browser checks: desktop 1280×800 and 1440×1000, phone 390×844; no horizontal 
 
 ## Current publication
 
-Private version 1 successfully deployed at https://earth-deep-time-atlas.bleonbalajj.chatgpt.site from commit 37d6bd8a1efe9375431c42f0d91e2c7283759eb0. A deployment success proves delivery, not visual or scientific completeness.
+Private version 6 is the last confirmed publication before this audit update. New changes are pending publication. A deployment success proves delivery, not visual or scientific completeness.
 
 ## Next priorities
 
-1. Fail closed when a requested scientific raster is unavailable; never label an old surface as the newly selected world.
-2. Obtain the explicit browser-testing request required by Sites, then validate and refine desktop/mobile rendering and core interactions.
+1. Retain the last complete surface during raster loads, pause playback while buffering, and report the pending reconstruction. Implemented; broader failure and device testing remains.
+2. Browser testing is explicitly authorized. Representative desktop/mobile checks have been performed; continue targeted regression checks as features change.
 3. Improve major missing scientific features in the original scope: historical plate geometry/motion, regional migration/range evidence, and detailed ice-age geography, using published data rather than invented shapes.
 4. Complete targeted source, accessibility and performance checks before declaring the goal achieved.
+
+
+## Latest focused checks
+
+Early Earth previously reused almost unchanged terrain above 540 Ma. Geometry, bare-rock treatment and cooling-stage clouds now vary with age, explicitly as illustration. Desktop browser snapshots checked 4540, 4400, 3800, 1800, 700 and 650 Ma; the nonglacial Cryogenian interval visibly differs from glacial coverage. No browser console errors in that check. Human Story Atlas search, selection of the Indus civilization and its evidence source were verified through the UI. This does not establish full scientific or physical-device completeness.

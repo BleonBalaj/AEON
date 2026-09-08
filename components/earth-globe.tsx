@@ -19,21 +19,27 @@ float fbm(vec3 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*noise(p);p=p*2.07+4.
 float heightAt(sampler2D tex,vec2 uv){vec2 c=texture2D(tex,uv).rg*255.;return c.x*256.+c.y-10000.;}
 void main(){
  vec3 n=normalize(vN);vec3 p=normalize(vP);float lat=abs(p.y);float h=mix(heightAt(mapA,vUv),heightAt(mapB,vUv),blend);
- float early=step(540.1,age);float rough=fbm(p*55.);float terrain=fbm(p*3.8+vec3(age*.00003));
- if(early>.5)h=(terrain-.54)*10000.;
+ // Precambrian terrain is a qualitative illustration, not reconstructed coastlines.
+ float early=step(540.0001,age);float rough=fbm(p*55.);float terrain=fbm(p*3.8);
+ float maturity=1.-smoothstep(2500.,4100.,age);float youngCrust=smoothstep(3800.,4450.,age);
+ float drift=age*.00085;vec3 ancientP=vec3(cos(drift)*p.x-sin(drift)*p.z,p.y,sin(drift)*p.x+cos(drift)*p.z);
+ if(early>.5){float islands=fbm(ancientP*6.2+vec3(4.1,1.7,age*.0005));float cores=fbm(ancientP*2.8+vec3(age*.00045,2.4,5.3));terrain=mix(islands,cores,maturity);h=(terrain-mix(.635,.51,maturity))*14000.;}
  float glacial=ice*step(.0001,age)*(1.-step(.125,age));float sea=seaLevel*glacial;
  float land=smoothstep(sea-35.,sea+65.,h);float shelf=smoothstep(-1600.,-50.,h);
  vec3 ocean=mix(vec3(.017,.055,.10),vec3(.038,.19,.22),shelf*.8);ocean+=rough*.014;
+ ocean=mix(ocean,mix(vec3(.012,.037,.049),vec3(.035,.12,.12),shelf*.55),early*smoothstep(2200.,3200.,age));
  vec3 low=mix(vec3(.12,.19,.12),vec3(.36,.32,.19),smoothstep(.15,.55,lat)*.65);
  if(age>470.)low=vec3(.30,.265,.20);
+ if(early>.5)low=mix(vec3(.21,.19,.16),vec3(.08,.075,.07),youngCrust);
  vec3 ground=mix(low,vec3(.42,.40,.34),smoothstep(500.,5000.,h));ground*=.78+rough*.45;
  vec3 base=mix(ocean,ground,land);
  vec3 sat=pow(texture2D(earth,vUv).rgb,vec3(2.2));base=mix(base,sat,modern*(1.-glacial));
- float cap=smoothstep(.91,.98,lat)*step(age,34.);float paleoIce=step(635.,age)*(1.-step(720.,age));cap=max(cap,paleoIce*smoothstep(.02,.28,lat));
+ float cap=smoothstep(.91,.98,lat)*step(age,34.);float sturtian=smoothstep(659.,661.,age)*(1.-smoothstep(715.,717.,age));float marinoan=smoothstep(635.,636.,age)*(1.-smoothstep(644.,645.,age));float paleoIce=max(sturtian,marinoan);cap=max(cap,paleoIce*smoothstep(.02,.28,lat));
  float lgmNA=exp(-pow((vUv.x-.22)/.12,2.))*smoothstep(.68,.88,p.y);float lgmEU=exp(-pow((vUv.x-.55)/.075,2.))*smoothstep(.73,.86,p.y);
  cap=max(cap,glacial*land*min(1.,lgmNA+lgmEU)*clamp(-sea/120.,0.,1.));base=mix(base,vec3(.66,.78,.83)*(rough*.16+.88),cap);
- float molten=smoothstep(4400.,4520.,age);float lava=pow(max(0.,1.-abs(terrain-.51)*25.),3.);vec3 magma=vec3(.038,.016,.011)+lava*vec3(1.6,.30,.015);base=mix(base,magma,molten);
- float cloudN=fbm(p*8.+vec3(tick*.001,0,0));float cloudShape=smoothstep(.53,.69,cloudN)*clouds*(1.-molten)*.40;cloudShape*=.4+.6*abs(sin(p.y*9.+cloudN*7.));base=mix(base,vec3(.78,.84,.87),cloudShape);
+ float molten=smoothstep(4460.,4520.,age);float lava=pow(max(0.,1.-abs(terrain-.51)*25.),3.);vec3 magma=vec3(.038,.016,.011)+lava*vec3(1.6,.30,.015);base=mix(base,magma,molten);
+ float cloudN=fbm(p*8.+vec3(tick*.001+early*age*.0003,0,early*1.7));float cloudShape=smoothstep(.53,.69,cloudN)*clouds*(1.-molten)*.40;cloudShape*=.4+.6*abs(sin(p.y*9.+cloudN*7.));
+ float steam=smoothstep(4350.,4460.,age)*(1.-molten);cloudShape=mix(cloudShape,clouds*(.22+.50*smoothstep(.32,.64,cloudN)),steam);base=mix(base,mix(vec3(.78,.84,.87),vec3(.58,.55,.50),steam*.7),cloudShape);
  if(climate>.5){vec3 temp=mix(vec3(.62,.23,.09),vec3(.10,.35,.60),smoothstep(.05,.9,lat));base=mix(base,temp,.53);}
  if(grid>.5){float a=abs(fract(vUv.x*24.+.5)-.5);float b=abs(fract(vUv.y*12.+.5)-.5);float line=1.-smoothstep(.001,.007,min(a,b));base=mix(base,vec3(.40,.60,.62),line*.22);}
  vec3 light=normalize(vec3(-.55,.5,1.));float diffuse=max(0.,dot(n,light));float shade=.065+diffuse*.96;vec3 color=base*shade;
