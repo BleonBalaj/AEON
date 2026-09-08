@@ -90,7 +90,7 @@ export default function Globe(props:Props){
  const dotKey=[Math.round(age*100000),layers.life,layers.humans,layers.civilization,selected?.id].join(':');if(dotKey!==lastDots){lastDots=dotKey;for(const c of dots.children){c.traverse(o=>{if(o instanceof THREE.Mesh&&o.material!==dotMat)(o.material as THREE.Material).dispose();});}dots.clear();clickable.length=0;
  if(layers.humans){for(const h of hominins)if(age<=h.start&&age>=h.end)for(const point of h.points)addPin(point[0],point[1],h.color,events.find(e=>e.title.includes(h.name)||e.keywords?.includes(h.name)));}
  if(layers.civilization&&age<=.012)for(const event of events)if(event.category==='Civilization'&&event.age>=age&&event.location)addPin(...event.location,'#dfc18c',event);
- if(layers.life&&age<=10)for(const event of events)if(event.location&&event.category==='Humanity'&&Math.abs(event.age-age)<Math.max(.03,age*.4))addPin(...event.location,'#c4dfbd',event);
+ if(layers.life&&age<=10)for(const event of events)if(event.location&&event.category==='Life'&&Math.abs(event.age-age)<Math.max(.03,age*.4))addPin(...event.location,'#c4dfbd',event);
  if(selected?.location)addPin(...selected.location,selected.category==='Extinction'?'#eea084':'#c7e7ce',selected,true);
  }
  if(focusTarget){camera.position.lerp(focusTarget,reduced?1:.07);if(camera.position.distanceTo(focusTarget)<.005)focusTarget=null;}
@@ -100,5 +100,6 @@ export default function Globe(props:Props){
  },[retry]);
  return <div className="globe-host" ref={host}>{!loaded&&!error&&<div className="globe-loading"><span/> Bringing Earth into view</div>}{error&&<div className="globe-error"><p>{error}</p><button onClick={()=>{setError('');setRetry(x=>x+1);}}>Reload globe</button></div>}</div>;
 }
+
 
 
