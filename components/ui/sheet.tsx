@@ -41,15 +41,32 @@ function SheetContent({
   children,
   side = 'right',
   showCloseButton = true,
+  scrollResetKey,
   ...props
 }: SheetPrimitive.Popup.Props & {
   side?: 'top' | 'right' | 'bottom' | 'left';
   showCloseButton?: boolean;
+  scrollResetKey?: string;
 }) {
+  const popupRef = React.useRef<HTMLDivElement>(null);
+  const resetReadingPosition = React.useCallback(() => {
+    const popup = popupRef.current;
+    if (!popup) return null;
+    popup.scrollTop = 0;
+    popup.querySelectorAll<HTMLElement>('.sheet-body').forEach(body => { body.scrollTop = 0; });
+    return popup.querySelector<HTMLElement>('[data-slot="sheet-title"]') ?? popup;
+  }, []);
+  React.useLayoutEffect(() => {
+    const title = resetReadingPosition();
+    // Changing chapters within an open panel must restart at its heading.
+    if (title) title.focus({preventScroll: true});
+  }, [scrollResetKey, resetReadingPosition]);
   return (
     <SheetPortal>
       <SheetOverlay />
       <SheetPrimitive.Popup
+        ref={popupRef}
+        initialFocus={resetReadingPosition}
         data-slot="sheet-content"
         data-side={side}
         className={cn(
@@ -102,6 +119,7 @@ function SheetFooter({ className, ...props }: React.ComponentProps<'div'>) {
 function SheetTitle({ className, ...props }: SheetPrimitive.Title.Props) {
   return (
     <SheetPrimitive.Title
+      tabIndex={-1}
       data-slot="sheet-title"
       className={cn(
         'text-foreground text-base font-medium cn-font-heading',

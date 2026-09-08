@@ -207,3 +207,11 @@
 
 /* Keep oversized globe hit targets behind surrounding controls. */
 .odyssey .odyssey-heading,.odyssey .odyssey-console,.odyssey .odyssey-settings{position:relative;z-index:5}
+/* The maker's mark is etched into a structural facet, not a control housing. */
+.atlas .topbar .brand{position:relative;isolation:isolate;flex-shrink:0;gap:12px;padding:7px 5px;text-decoration:none}
+.atlas .topbar .brand:before{content:'';position:absolute;z-index:-1;inset:-10px -19px -8px -20px;pointer-events:none;clip-path:polygon(12% 0,94% 0,100% 74%,81% 100%,0 89%,3% 24%);background:linear-gradient(156deg,transparent 9%,#e3ddc512 10%,#02060845 11%,#afbab509 39%,transparent 40%),linear-gradient(12deg,#0008,transparent 62%);opacity:.85}
+.atlas .topbar .brand:after{content:'';position:absolute;left:-8px;right:-14px;bottom:0;height:1px;transform:rotate(-3deg);transform-origin:left;pointer-events:none;background:linear-gradient(90deg,transparent,#04080acc 18%,#d5d9bd66 48%,#a4b5bb30 76%,transparent);box-shadow:0 1px 0 #0008}
+.atlas .topbar .brand>span{color:#bfc7c0;background:linear-gradient(180deg,#edf0df 6%,#adbab4 37%,#798b89 49%,#dce1ca 56%,#adbdb7 80%,#7e9499);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 -1px 0 #000d) drop-shadow(0 1px 0 #e5e4cb2e);text-shadow:none}
+.atlas .topbar .brand>svg{color:#b6c7b6;stroke-width:1.55;filter:drop-shadow(0 -1px 0 #000) drop-shadow(0 1px 0 #e3e8cd65) drop-shadow(0 2px 3px #000a);opacity:.94}
+.atlas .topbar .brand:hover>svg{color:#d6e0c7}.atlas .topbar .brand:hover>span{filter:drop-shadow(0 -1px 0 #000d) drop-shadow(0 1px 0 #e5e4cb55)}
+@media(max-width:640px){.atlas .topbar .brand{gap:7px;padding:5px 0}.atlas .topbar .brand:before{inset:-8px -8px -8px -14px}.atlas .topbar .brand:after{left:-5px;right:-8px}}
