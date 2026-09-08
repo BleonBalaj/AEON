@@ -137,3 +137,15 @@
 @media(max-width:1000px) and (min-width:641px){.atlas:not(.odyssey) .chamber .globe-host{inset:2% 1% 9% 35%}.atlas:not(.odyssey) .chamber .globe-caption{left:67%}}
 @media(max-width:640px){.atlas:not(.odyssey) .chamber .globe-host{inset:210px -5% 50px -5%}.atlas:not(.odyssey) .chamber .globe-caption{left:50%;bottom:7%}.atlas:not(.odyssey) .chamber>.time-panel{padding:17px 13px 10px}.odyssey .odyssey-console{padding:17px 13px 0;border-radius:16px}}
 @media(min-width:1001px){.atlas:not(.odyssey) .chamber .globe-host{inset:5% 25% 5% 25%}.atlas:not(.odyssey) .chamber>.workspace:before{left:25%;right:25%;top:5%;bottom:5%}}
+/* Overscan the optical surface: close zoom extends beyond the old central rectangle.
+   The expanded frustum preserves the default globe scale without limiting zoom. */
+.atlas:not(.odyssey) .chamber .globe-host{inset:-40% -9.5%;--globe-framing-scale:2;mask-image:radial-gradient(ellipse 51% 30% at 50% 50%,#000 72%,#000d 84%,transparent 100%)}
+.atlas:not(.odyssey) .chamber>.workspace{overflow:visible}
+.atlas:not(.odyssey) .chamber>.time-panel,.odyssey .odyssey-console{border:1px solid #bbaa8540;border-top-color:#e5d5b87a;border-radius:48% 48% 28px 28px / 24px 24px 28px 28px;background:radial-gradient(ellipse at 50% 0,#d4c5aa12,transparent 65%),linear-gradient(160deg,#24231f75,#080b0bd9 42%,#1517159c);backdrop-filter:blur(18px) saturate(.45);box-shadow:inset 0 2px 1px #f9edce18,inset 0 -1px 1px #b4c3c01a,0 -3px 16px #e2d2b209,0 10px 30px #0008;padding:26px 28px 10px}
+.atlas:not(.odyssey) .chamber>.time-panel:before,.odyssey .odyssey-console:before{top:5px;left:8%;right:8%;height:14px;border-top:1px solid #e9ddc327;border-radius:50%;background:none}
+.atlas .time-panel .timeline-track{margin-top:20px}
+@media(max-width:1000px) and (min-width:641px){.atlas:not(.odyssey) .chamber .globe-host{inset:-40% -43% -40% -9%;}}
+@media(max-width:640px){.atlas:not(.odyssey) .chamber .globe-host{inset:45px -55% -115px;--globe-framing-scale:2;mask-image:radial-gradient(ellipse 48% 49% at 50% 50%,#000 48%,#000d 70%,transparent 100%)}.atlas:not(.odyssey) .chamber>.time-panel,.odyssey .odyssey-console{padding:24px 15px 12px;border-radius:45% 45% 22px 22px / 14px 14px 22px 22px}}
+
+.odyssey .odyssey-world .globe-host{inset:-50% -40%;--globe-framing-scale:2;mask-image:radial-gradient(ellipse 43% 30% at 50% 50%,#000 70%,#000d 84%,transparent 100%)}
+.odyssey .odyssey-story{position:relative;z-index:3}
