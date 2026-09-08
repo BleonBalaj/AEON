@@ -185,39 +185,20 @@
 .atlas:not(.odyssey) .chamber:after{background:radial-gradient(ellipse at 47% 38%,#6b438321 0,transparent 36%),radial-gradient(ellipse at 65% 43%,#65498416 0,transparent 28%),radial-gradient(ellipse at 30% 47%,#3e436d18 0,transparent 31%),linear-gradient(180deg,#03080b33,transparent 13%,transparent 65%,#040a0f55 77%,#030a1099)}
 .atlas:not(.odyssey) .chamber>.workspace:before{inset:0 -3%;border:0;border-radius:0;box-shadow:none;background-image:radial-gradient(circle at 13% 27%,#e0d3edb3 0 .6px,transparent 1.5px),radial-gradient(circle at 32% 15%,#ccbef780 0 .5px,transparent 1.4px),radial-gradient(circle at 71% 19%,#d2d5f0a3 0 .7px,transparent 1.6px),radial-gradient(circle at 87% 59%,#e8e0f78a 0 .5px,transparent 1.4px),radial-gradient(circle at 62% 83%,#d6c5f37a 0 .6px,transparent 1.5px),radial-gradient(circle at 24% 77%,#b1bbdd8a 0 .5px,transparent 1.4px),radial-gradient(circle at 75% 65%,#e4d7ff80 0 .5px,transparent 1.4px);pointer-events:none;opacity:.85}
 .atlas.odyssey:after{background:radial-gradient(ellipse at 35% 37%,#69438224,transparent 38%),radial-gradient(ellipse at 56% 49%,#51548416,transparent 27%),linear-gradient(180deg,transparent,#03090d33 12%,transparent 55%,#030a1199 75%,#030a11e6)}
-/* Navigation is recessed into a single rail beneath the upper arch. */
-.atlas .topbar nav{position:relative;isolation:isolate;gap:0;padding:0 14px;height:49px;align-self:center;border:1px solid #b7c3b929;border-top-color:#e1ddc742;border-radius:14px 14px 38px 38px / 10px 10px 20px 20px;background:linear-gradient(180deg,#020608a8,#18212663 55%,#93aaa412);box-shadow:inset 0 2px 7px #000b,inset 0 -1px 0 #d5e2d728,0 2px 0 #03070ad9,0 3px 0 #b7c2b719;backdrop-filter:blur(12px)}
-.atlas .topbar nav>a,.atlas .topbar nav>button{height:100%;padding:0 clamp(12px,1.25vw,24px);display:flex;align-items:center;justify-content:center;gap:8px;position:relative;white-space:nowrap;font-size:inherit}
-.atlas .topbar nav>*+*{border-left:1px solid #bacbc210}
-.atlas .topbar nav .active{background:radial-gradient(ellipse at 50% 100%,#b9cfcc18,transparent 75%);color:#e4ece5}
-.atlas .topbar nav .active:after{content:'';position:absolute;left:20%;right:20%;bottom:0;height:1px;background:linear-gradient(90deg,transparent,#e5dbc0,transparent);box-shadow:0 -2px 12px #d6d2b94d}
-.atlas .topbar nav>a:hover,.atlas .topbar nav>button:hover{background:linear-gradient(180deg,transparent,#b6c8c010)}
-@media(max-width:1250px){.atlas .topbar nav{padding:0 6px}.atlas .topbar nav>a,.atlas .topbar nav>button{padding:0 10px}}
-@media(max-width:640px){.atlas:not(.odyssey) .chamber>.topbar nav,.atlas.odyssey .topbar nav{height:36px;padding:0 7px;border-radius:9px 9px 20px 20px / 7px 7px 12px 12px}.atlas .topbar nav>a,.atlas .topbar nav>button{padding:0 9px;font-size:11px}.atlas:not(.odyssey) .chamber>.workspace:before{inset:190px 0 30px}}
-.atlas .topbar .search-button{white-space:nowrap;flex-shrink:0}
-@media(max-width:1450px){.atlas .topbar .brand-note{display:none}}
-/* Sculpted glass keys suspended within the upper architectural seam. */
-.atlas .topbar nav{gap:5px;padding:4px 7px 7px;height:58px;border:0;border-radius:0;background:none;box-shadow:none;backdrop-filter:none;overflow:visible}
-.atlas .topbar nav:before{content:'';position:absolute;z-index:-2;inset:0 -17px -3px;border-bottom:1px solid #d5dbc35e;border-radius:0 0 50% 50% / 0 0 11px 11px;background:linear-gradient(180deg,transparent 18%,#b5c2bd09 76%,#d8dfcf15);box-shadow:0 3px 0 #010609,0 4px 0 #bccdc026;pointer-events:none}
-.atlas .topbar nav>a,.atlas .topbar nav>button{height:100%;padding:0 clamp(13px,1.35vw,26px);border:0!important;isolation:isolate;transition:color .22s,filter .22s;filter:drop-shadow(0 4px 4px #0008);background:none!important}
-.atlas .topbar nav>a:before,.atlas .topbar nav>button:before{content:'';position:absolute;inset:0;z-index:-1;clip-path:polygon(8% 0,92% 0,100% 23%,96% 88%,85% 100%,15% 100%,4% 88%,0 23%);background:linear-gradient(120deg,#e0e7db5e,transparent 21%,transparent 76%,#b1cbd638),linear-gradient(180deg,#a8bcb52b 0,#152027b8 4%,#071016d9 50%,#253439bb 95%,#d5decb63);box-shadow:inset 0 1px 0 #dce5ce70,inset 0 -1px 0 #bed7d56b;transition:background .25s,filter .25s}
-.atlas .topbar nav>a:after,.atlas .topbar nav>button:after{content:'';position:absolute;left:24%;right:24%;bottom:3px;height:1px;background:linear-gradient(90deg,transparent,#9bb7bb50,transparent);box-shadow:none}
-.atlas .topbar nav .active{color:#f0f2df;text-shadow:0 0 17px #cbdfe530}
-.atlas .topbar nav .active:before{background:linear-gradient(120deg,#e2efcf88,transparent 26%,transparent 73%,#c4dde263),linear-gradient(180deg,#dee6c947 0,#3b4b4e9e 5%,#172b34d9 48%,#516761c9 96%,#e9e5c8c2);box-shadow:inset 0 1px 0 #f0efd4b0,inset 0 -1px 0 #e6e8ccab}
-.atlas .topbar nav .active:after{left:30%;right:30%;bottom:3px;height:2px;background:#e4ecd1;box-shadow:0 0 7px #dce9cc,0 -5px 18px #b8e0df88}
-.atlas .topbar nav>a:hover:before,.atlas .topbar nav>button:hover:before{filter:brightness(1.35)}
-@media(max-width:1250px){.atlas .topbar nav>a,.atlas .topbar nav>button{padding:0 12px}.atlas .topbar nav{gap:4px}}
-@media(max-width:640px){.atlas:not(.odyssey) .chamber>.topbar nav,.atlas.odyssey .topbar nav{height:40px;padding:3px 0 5px;background:none;border:0;border-radius:0}.atlas .topbar nav:before{inset:0 -8px -1px}.atlas .topbar nav>a,.atlas .topbar nav>button{padding:0 13px}.atlas .topbar nav .active:after{height:1px}}
-/* Curved optical keys with embedded navigation symbols and a layered luminous rim. */
-.atlas .topbar nav{height:62px;padding:5px 8px 9px;gap:7px}
-.atlas .topbar nav:before{inset:0 -22px -4px;border-top:1px solid #ccdac822;border-bottom:1px solid #cedccb77;border-radius:50% 50% 40% 40% / 8px 8px 14px 14px;background:linear-gradient(180deg,#050a0ab0,#c8d9d50a 44%,#020608a3 85%,#b5cbc919);box-shadow:inset 0 2px 3px #000,0 4px 1px #010507,0 5px 0 #bccdc02c}
-.atlas .topbar nav>a,.atlas .topbar nav>button{gap:10px;padding:0 clamp(14px,1.2vw,24px)}
-.atlas .topbar nav>a:before,.atlas .topbar nav>button:before{clip-path:none;border-radius:16px 29px 16px 29px / 11px 22px 11px 22px;border:1px solid #aeced22b;border-top-color:#cde2d25e;background:radial-gradient(ellipse at 18% 15%,#c5e4da2b,transparent 42%),linear-gradient(180deg,#081215ee,#1b2c34c9 55%,#46595a80);box-shadow:inset 0 2px 2px #deeee523,inset 0 -2px 3px #030809,0 1px 0 #9ebaba35}
-.atlas .topbar nav .active:before{border-color:#c9ded379;background:radial-gradient(ellipse at 18% 20%,#e4edcf52,transparent 52%),linear-gradient(180deg,#263b40ef,#253c47d9 55%,#728981ad);box-shadow:inset 0 2px 2px #eff2d966,inset 0 -2px 3px #0c2024,0 0 15px #bce1dd18,0 1px 0 #d4e7cf80}
-.atlas .topbar nav>a:after,.atlas .topbar nav>button:after{left:24%;right:24%;bottom:4px;border-radius:50%;height:5px;background:none;border-bottom:1px solid #b5d5d541;box-shadow:none}
-.atlas .topbar nav .active:after{left:27%;right:27%;height:5px;background:none;border-bottom:1px solid #e2eed3;box-shadow:0 4px 8px -4px #e2eed3}
-.atlas .topbar nav svg{color:#a9c8cd;filter:drop-shadow(0 0 4px #a6d2d92b);stroke-width:1.25;width:16px;height:16px}
-.atlas .topbar nav .active svg{color:#e2edd0;filter:drop-shadow(0 0 5px #d0e9cb88);stroke-width:1.5}
-@media(max-width:1450px){.atlas .topbar nav>a,.atlas .topbar nav>button{padding:0 12px;gap:8px}.atlas .topbar nav{gap:5px}.atlas .topbar .search-button kbd{display:none}}
-@media(max-width:640px){.atlas:not(.odyssey) .chamber>.topbar nav,.atlas.odyssey .topbar nav{height:43px;padding:3px 0 6px}.atlas .topbar nav:before{inset:0 -7px -2px}.atlas .topbar nav>a,.atlas .topbar nav>button{padding:0 13px;gap:7px}.atlas .topbar nav svg{width:13px;height:13px}.atlas .topbar nav>a:before,.atlas .topbar nav>button:before{border-radius:11px 20px 11px 20px / 8px 15px 8px 15px}}
-.atlas .topbar nav:before{background:linear-gradient(180deg,transparent 15%,#c8d9d509 66%,#b5cbc911);box-shadow:0 3px 0 #02070b66,0 4px 0 #bccdc020}
+/* Thin optical control slots follow the upper chamber seam. */
+.atlas .topbar nav{position:relative;isolation:isolate;align-self:center;height:40px;gap:8px;padding:2px 8px 4px;border:0;border-radius:0;background:none;box-shadow:none;backdrop-filter:none;overflow:visible}
+.atlas .topbar nav:before{content:'';position:absolute;z-index:-2;inset:-5px -18px -5px;border-top:1px solid #c6d3c721;border-bottom:1px solid #cbd5c747;border-radius:50% / 10px;pointer-events:none;background:linear-gradient(180deg,transparent 30%,#aecbd506 85%,#d3dbc811)}
+.atlas .topbar nav>a,.atlas .topbar nav>button{position:relative;isolation:isolate;height:100%;display:flex;align-items:center;justify-content:center;gap:9px;padding:0 clamp(15px,1.3vw,25px);border:0!important;background:none!important;white-space:nowrap;font-size:inherit;color:#acbdbe;transition:color .2s;filter:drop-shadow(0 2px 2px #0008)}
+.atlas .topbar nav>a:before,.atlas .topbar nav>button:before,.atlas .topbar nav>a:after,.atlas .topbar nav>button:after{content:'';position:absolute;z-index:-1;pointer-events:none;clip-path:polygon(11px 0,100% 0,calc(100% - 11px) 100%,0 100%);border:0;border-radius:0;box-shadow:none;transition:background .2s}
+.atlas .topbar nav>a:before,.atlas .topbar nav>button:before{inset:0;background:linear-gradient(110deg,#cfe0d881,#91b5c321 26%,#718f9921 75%,#cfe0d855)}
+.atlas .topbar nav>a:after,.atlas .topbar nav>button:after{inset:1px;height:auto;background:linear-gradient(180deg,#070f13f2,#1b2930eb);}
+.atlas .topbar nav .active{color:#edf0dc;text-shadow:0 0 12px #d4e5d822}
+.atlas .topbar nav .active:before{background:linear-gradient(110deg,#e4ecd1,#a6c9d669 26%,#859dca69 75%,#e4ecd1);filter:drop-shadow(0 0 5px #bbd9db44)}
+.atlas .topbar nav .active:after{background:radial-gradient(ellipse at 20% 0,#84998d42,transparent 65%),linear-gradient(180deg,#15272fee,#283039ee)}
+.atlas .topbar nav>a:hover,.atlas .topbar nav>button:hover{color:#f0f2e6}
+.atlas .topbar nav>a:hover:before,.atlas .topbar nav>button:hover:before{background:linear-gradient(110deg,#e2ead3,#8eb2c563,#d8e5d59c)}
+.atlas .topbar nav svg{width:14px;height:14px;color:#a4c0c8;stroke-width:1.3}
+.atlas .topbar nav .active svg{color:#e2edcf;filter:drop-shadow(0 0 5px #c9e0c577);stroke-width:1.5}
+.atlas .topbar .search-button{white-space:nowrap;flex-shrink:0;padding-top:7px;padding-bottom:7px;border-radius:3px 13px 3px 13px}
+@media(max-width:1450px){.atlas .topbar .brand-note{display:none}.atlas .topbar .search-button kbd{display:none}.atlas .topbar nav>a,.atlas .topbar nav>button{padding:0 15px;gap:7px}.atlas .topbar nav{gap:5px}}
+@media(max-width:640px){.atlas:not(.odyssey) .chamber>.topbar nav,.atlas.odyssey .topbar nav{height:34px;padding:2px 0 3px;gap:3px;border:0;border-radius:0;background:none}.atlas .topbar nav:before{inset:-3px -8px -3px}.atlas .topbar nav>a,.atlas .topbar nav>button{padding:0 13px;font-size:11px;gap:7px}.atlas .topbar nav svg{width:12px;height:12px}.atlas:not(.odyssey) .chamber>.workspace:before{inset:190px 0 30px}}
