@@ -127,3 +127,13 @@
 @media(max-width:1000px) and (min-width:641px){.atlas:not(.odyssey) .chamber{grid-template-rows:58px minmax(0,1fr) auto;min-height:690px}}
 @media(max-width:640px){.atlas:not(.odyssey) .chamber{padding-top:24px;min-height:0;grid-template-rows:58px 590px auto}.atlas:not(.odyssey) .chamber .globe-host{inset:210px -16% 50px -16%}.atlas:not(.odyssey) .chamber .mobile-layer-toggle{top:235px}.atlas:not(.odyssey) .chamber>.time-panel{padding:18px 10px 10px}.atlas.odyssey{padding-top:24px}.atlas:not(.odyssey) .chamber .life-overlay{top:232px}}
 @media(max-width:640px){.atlas:not(.odyssey) .chamber>.topbar nav{display:flex;margin-left:auto;font-size:11px;gap:0}.atlas:not(.odyssey) .chamber>.topbar nav>button{display:none}.atlas:not(.odyssey) .chamber>.topbar{gap:12px}.atlas:not(.odyssey) .chamber>.topbar .search-button{margin-left:0}}
+/* Symmetric globe viewport and a smoked-glass console seated in the chamber. */
+.atlas:not(.odyssey) .chamber .globe-host{inset:3% 25% 8% 25%}
+.atlas:not(.odyssey) .chamber>.workspace:before{left:25%;right:25%;top:3%;bottom:8%}
+.atlas:not(.odyssey) .chamber .globe-caption{left:50%;bottom:3%}
+.atlas:not(.odyssey) .chamber>.time-panel,.odyssey .odyssey-console{background:linear-gradient(125deg,#afc5cf0c,transparent 38%,#d2c09909),linear-gradient(180deg,#0b141cba,#080e15d9);border:1px solid #d9c7a62d;border-top-color:#e5d7b54f;border-radius:18px;backdrop-filter:blur(22px) saturate(.8);box-shadow:inset 0 1px 0 #f1e8d714,inset 0 -1px 0 #d7e4e808,0 12px 35px #0006;padding:16px 22px 9px}
+.atlas:not(.odyssey) .chamber>.time-panel:before,.odyssey .odyssey-console:before{display:block;content:'';position:absolute;top:-1px;left:12%;right:12%;height:1px;background:linear-gradient(90deg,transparent,#d7c4a477,transparent);pointer-events:none}
+.atlas:not(.odyssey) .chamber{gap:8px}.atlas:not(.odyssey) .chamber .bottom-workspace{bottom:2%}.odyssey .odyssey-console{position:relative;padding-bottom:0}
+@media(max-width:1000px) and (min-width:641px){.atlas:not(.odyssey) .chamber .globe-host{inset:2% 1% 9% 35%}.atlas:not(.odyssey) .chamber .globe-caption{left:67%}}
+@media(max-width:640px){.atlas:not(.odyssey) .chamber .globe-host{inset:210px -5% 50px -5%}.atlas:not(.odyssey) .chamber .globe-caption{left:50%;bottom:7%}.atlas:not(.odyssey) .chamber>.time-panel{padding:17px 13px 10px}.odyssey .odyssey-console{padding:17px 13px 0;border-radius:16px}}
+@media(min-width:1001px){.atlas:not(.odyssey) .chamber .globe-host{inset:5% 25% 5% 25%}.atlas:not(.odyssey) .chamber>.workspace:before{left:25%;right:25%;top:5%;bottom:5%}}
