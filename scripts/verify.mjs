@@ -44,3 +44,5 @@ assert.equal(environment(.0117).climate,'Holocene interglacial');
 for(const age of [0,.01,.1,1,5])assert(!/human|hominin|sapiens/i.test(JSON.stringify(lifeAt(age))),'Earth biosphere overlay must stay separate from Human Odyssey');
 for(const [id,period] of [['ordovician','Ordovician'],['devonian','Devonian'],['permian','Permian'],['triassic','Triassic'],['kpg','Cretaceous']])assert.equal(chapterChronology(events.find(e=>e.id===id)).period,period,`${id} chapter must use its ending period`);
 console.log(`PASS: ${scales.length} time scales, 4,005 round-trip positions, geological boundaries, ${events.length} sourced chapters, 5 extinctions, sea-level anchors, 109 non-flat elevation rasters, coordinate orientation plate geometry, Cryogenian surface/context agreement and Earth-only biosphere text.`);
+
+for(const age of [.0046,.0033])assert.deepEqual(iceAgeGeography(age).regions,[],'Holocene cities must not show Ice Age land bridges');

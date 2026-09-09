@@ -35,7 +35,11 @@ void main(){
  ocean=mix(ocean,mix(vec3(.012,.037,.049),vec3(.035,.12,.12),shelf*.55),early*smoothstep(2200.,3200.,age));
  // Broad surface character only: PaleoDEM supplies elevation, while these
  // climate belts remain illustrative and must not be read as biome boundaries.
- float plants=1.-smoothstep(470.,500.,age);
+ // Early low-growing land vegetation is distinct from Devonian forest
+ // expansion. These weights illustrate surface character, not coverage data.
+ float pioneers=(1.-smoothstep(430.,470.,age))*.22;
+ float forests=1.-smoothstep(360.,395.,age);
+ float plants=mix(pioneers,1.,forests);
  float equator=1.-smoothstep(.10,.38,lat);float subtropics=exp(-pow((lat-.34)/.16,2.));
  float pangaeaDry=smoothstep(180.,235.,age)*(1.-smoothstep(315.,335.,age));
  float moisture=clamp(.18+equator*.52+(rough-.5)*.72-subtropics*.18-pangaeaDry*(.24+.22*rough),0.,1.);
@@ -48,7 +52,7 @@ void main(){
  float coalWet=smoothstep(299.,307.,age)*(1.-smoothstep(335.,350.,age))*equator;
  low=mix(low,vec3(.09,.225,.135),coalWet*moisture*.55);
  low=mix(low,dryland,pangaeaDry*(.24+.26*subtropics));
- if(age>470.)low=vec3(.30,.265,.20);
+ if(age>470.)low=mineral;
  if(early>.5)low=mix(vec3(.21,.19,.16),vec3(.08,.075,.07),youngCrust);
  vec3 ground=mix(low,vec3(.42,.40,.34),smoothstep(500.,5000.,h));ground*=.78+rough*.45;
  vec3 base=mix(ocean,ground,land);
@@ -79,7 +83,8 @@ void main(){
 function xyz(lat:number,lon:number,r=1){const a=THREE.MathUtils.degToRad(lat),b=THREE.MathUtils.degToRad(lon);return new THREE.Vector3(Math.cos(a)*Math.cos(b)*r,Math.sin(a)*r,-Math.cos(a)*Math.sin(b)*r);}
 function disposeTree(obj:THREE.Object3D){obj.traverse(o=>{const m=o as THREE.Mesh;if(m.geometry)m.geometry.dispose();if(m.material){for(const a of Array.isArray(m.material)?m.material:[m.material])a.dispose();}});}
 export default function Globe(props:Props){
- const host=useRef<HTMLDivElement>(null),current=useRef(props);current.current=props;
+ const host=useRef<HTMLDivElement>(null),current=useRef(props);
+ useEffect(()=>{current.current=props;},[props]);
  const [error,setError]=useState(''),[retry,setRetry]=useState(0);const [loaded,setLoaded]=useState(false);
  useEffect(()=>{
  const el=host.current;if(!el)return;let renderer:THREE.WebGLRenderer;
@@ -96,8 +101,8 @@ export default function Globe(props:Props){
  const starArray=new Float32Array(420*3);let seed=83;function rand(){seed=(seed*16807)%2147483647;return seed/2147483647;}
  for(let i=0;i<starArray.length;i+=3){const v=xyz(rand()*180-90,rand()*360-180,12);starArray.set(v.toArray(),i);}
  const starGeometry=new THREE.BufferGeometry();starGeometry.setAttribute('position',new THREE.BufferAttribute(starArray,3));const stars=new THREE.Points(starGeometry,new THREE.PointsMaterial({color:'#93b3bf',size:.014,transparent:true,opacity:.48}));scene.add(stars);
- const texCache=new Map<number,THREE.Texture>(),pending=new Set<number>(),failed=new Set<number>();const loader=new THREE.TextureLoader();let renderedAge:number|null=null;let requestKey='';let earthLoaded=false;let lastLoading=false;let textureFailure=false;
- function loadGrid(age:number){if(texCache.has(age)||pending.has(age)||failed.has(age))return;pending.add(age);loader.load(`/paleo/${age}.png`,tex=>{pending.delete(age);if(!alive){tex.dispose();return;}tex.minFilter=THREE.LinearFilter;tex.magFilter=THREE.LinearFilter;tex.generateMipmaps=false;texCache.set(age,tex);if(texCache.size>18){for(const [key,t]of texCache){if(key!==0&&key!==age&&t!==uniforms.mapA.value&&t!==uniforms.mapB.value){t.dispose();texCache.delete(key);break;}}}},undefined,()=>{pending.delete(age);failed.add(age);if(alive&&requestKey.split(':').map(Number).includes(age)){textureFailure=true;current.current.onStatus('Reconstruction unavailable — holding the last loaded world.');setError('This scientific reconstruction could not load. Choose another chapter or reload the globe.');}});}
+ const texCache=new Map<number,THREE.Texture>(),pending=new Set<number>(),failed=new Set<number>();const loader=new THREE.TextureLoader();let renderedAge:number|null=null;let requestKey='';let earthLoaded=false;let lastLoading=false;
+ function loadGrid(age:number){if(texCache.has(age)||pending.has(age)||failed.has(age))return;pending.add(age);loader.load(`/paleo/${age}.png`,tex=>{pending.delete(age);if(!alive){tex.dispose();return;}tex.minFilter=THREE.LinearFilter;tex.magFilter=THREE.LinearFilter;tex.generateMipmaps=false;texCache.set(age,tex);if(texCache.size>18){for(const [key,t]of texCache){if(key!==0&&key!==age&&t!==uniforms.mapA.value&&t!==uniforms.mapB.value){t.dispose();texCache.delete(key);break;}}}},undefined,()=>{pending.delete(age);failed.add(age);if(alive&&requestKey.split(':').map(Number).includes(age)){current.current.onStatus('Reconstruction unavailable — holding the last loaded world.');setError('This scientific reconstruction could not load. Choose another chapter or reload the globe.');}});}
  loader.load('/textures/earth.webp',tex=>{if(!alive){tex.dispose();return;}tex.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());uniforms.earth.value=tex;earthLoaded=true;setLoaded(true);},undefined,()=>{if(alive){setLoaded(true);current.current.onStatus('NASA imagery unavailable; showing elevation-derived Earth.');}});loadGrid(0);
  const plates=new THREE.Group();scene.add(plates);let plateFail=false;
  const abort=new AbortController();fetch('/plates.json',{signal:abort.signal}).then(r=>{if(!r.ok)throw Error();return r.json();}).then(data=>{if(!alive)return;const vertices:number[]=[];for(const f of (data as {features:{geometry:{type:string;coordinates:number[][]}}[]}).features){if(f.geometry.type!=='LineString')continue;const pts=f.geometry.coordinates;for(let i=1;i<pts.length;i++)vertices.push(...xyz(pts[i-1][1],pts[i-1][0],1.004).toArray(),...xyz(pts[i][1],pts[i][0],1.004).toArray());}const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));plates.add(new THREE.LineSegments(g,new THREE.LineBasicMaterial({color:'#edbb7e',transparent:true,opacity:.7})));}).catch(()=>{plateFail=true;});
@@ -115,7 +120,7 @@ export default function Globe(props:Props){
  const a=requestedAge>.12&&requestedAge<=540?Math.floor(requestedAge/5)*5:0;
  const b=requestedAge>.12&&requestedAge<=540?Math.min(540,a+5):0;
  const key=`${a}:${b}`;
- if(key!==requestKey){requestKey=key;textureFailure=false;setError('');loadGrid(a);loadGrid(b);if(failed.has(a)||failed.has(b)){textureFailure=true;setError('This scientific reconstruction could not load. Choose another chapter or reload the globe.');}}
+ if(key!==requestKey){requestKey=key;setError('');loadGrid(a);loadGrid(b);if(failed.has(a)||failed.has(b))setError('This scientific reconstruction could not load. Choose another chapter or reload the globe.');}
  const surfaceReady=requestedAge>540||(texCache.has(a)&&texCache.has(b))||(requestedAge<=.12&&earthLoaded);
  current.current.onBuffering?.(!surfaceReady);
  if(surfaceReady){

@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useRef, useCallback } from 'react';
+import Link from 'next/link';
 import {
   Orbit,
   Play,
@@ -28,7 +29,6 @@ import {
   ExternalLink,
   SlidersHorizontal,
   GitCompareArrows,
-  Check,
   Flame,
   Activity,
 } from 'lucide-react';
@@ -183,8 +183,10 @@ export default function Home() {
   const api = useRef<GlobeApi | null>(null),
     ageRef = useRef(age),
     scaleRef = useRef(scale);
-  ageRef.current = age;
-  scaleRef.current = scale;
+  useEffect(() => {
+    ageRef.current = age;
+    scaleRef.current = scale;
+  }, [age, scale]);
   const story = selected ?? nearestEvent(age),
     time = chronology(age),
     conditions = environment(age);
@@ -428,7 +430,7 @@ export default function Home() {
         }));
   const visibleMarkers = events
     .filter((e) => e.age <= scales[scale].max)
-    .filter((e, i) =>
+    .filter((e) =>
       scale === 0
         ? featured.includes(e.id)
         : scale === 1
@@ -448,10 +450,10 @@ export default function Home() {
       </a>
       <div className="chamber">
         <header className="topbar">
-          <a className="brand" href="/" aria-label="AEON home">
+          <Link className="brand" href="/" aria-label="AEON home">
             <Orbit size={30} />
             <span>AEON</span>
-          </a>
+          </Link>
           <span className="brand-note">
             A LIVING HISTORY
             <br />
@@ -462,10 +464,10 @@ export default function Home() {
               <Globe2 size={15} />
               Explore Earth
             </button>
-            <a href="/human-odyssey">
+            <Link href="/human-odyssey">
               <Users size={15} />
               Human Odyssey
-            </a>
+            </Link>
             <button onClick={() => setDrawer('eras')}>
               <Clock3 size={15} />
               Era explorer
@@ -567,7 +569,7 @@ export default function Home() {
                       ? `ILLUSTRATION · ${conditions.climate.toUpperCase()}`
                       : 'ILLUSTRATION · PRECAMBRIAN WORLD'
               : age > 0.12
-                ? 'PALEOMAP SCIENTIFIC RECONSTRUCTION'
+                ? 'PALEOMAP TERRAIN · ILLUSTRATIVE SURFACE'
                 : age > 0.012 && layers.ice
                   ? 'APPROXIMATE GLACIAL GEOGRAPHY'
                   : 'NASA BLUE MARBLE · MODERN EARTH'}
@@ -636,10 +638,11 @@ export default function Home() {
             {layerDefs
               .filter((l) => ['plates', 'life', 'ice'].includes(l.key))
               .map((l) => (
-                <label className="layer-row" key={l.key}>
+                <label className="layer-row" key={l.key} htmlFor={`quick-layer-${l.key}`}>
                   <l.icon size={15} />
                   <span>{l.name}</span>
                   <Switch
+                    id={`quick-layer-${l.key}`}
                     size="sm"
                     checked={layers[l.key]}
                     onCheckedChange={(v) => toggleLayer(l.key, v)}
@@ -1010,7 +1013,7 @@ export default function Home() {
           </button>
         </div>
         <div className="chapter-row">
-          {keyChapters.slice(0, 8).map((e, i) => {
+          {keyChapters.slice(0, 8).map((e) => {
             const Icon = categoryIcon[e.category];
             return (
               <button
@@ -1120,10 +1123,11 @@ export default function Home() {
               <div className="layer-catalog">
                 {layerDefs.map((l) => (
                   <div key={l.key}>
-                    <label>
+                    <label htmlFor={`catalog-layer-${l.key}`}>
                       <l.icon size={18} />
                       <strong>{l.name}</strong>
                       <Switch
+                        id={`catalog-layer-${l.key}`}
                         checked={layers[l.key]}
                         onCheckedChange={(v) => toggleLayer(l.key, v)}
                       />
