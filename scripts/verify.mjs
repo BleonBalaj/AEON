@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import ts from 'typescript';
 import sharp from 'sharp';
 const js=ts.transpileModule(fs.readFileSync('lib/earth/history.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText;
-const {events,sources,chronology,scales,toPosition,fromPosition,seaLevel,cryogenianIce,environment,lifeAt}=await import('data:text/javascript;base64,'+Buffer.from(js).toString('base64'));
+const {events,sources,chronology,chapterChronology,scales,toPosition,fromPosition,seaLevel,cryogenianIce,environment,lifeAt}=await import('data:text/javascript;base64,'+Buffer.from(js).toString('base64'));
 for(let scale=0;scale<scales.length;scale++){
  for(let p=0;p<=100;p+=.125){const age=fromPosition(p,scale);assert(age>=0&&age<=scales[scale].max);assert(Math.abs(toPosition(age,scale)-p)<1e-8,`Timeline round trip ${scale}:${p}`);}
  assert.equal(fromPosition(0,scale),scales[scale].max);assert.equal(fromPosition(100,scale),0);
@@ -33,4 +33,5 @@ assert.equal(environment(640).climate,'Marinoan glaciation');
 assert.equal(environment(.0118).climate,'Glacial–interglacial cycles');
 assert.equal(environment(.0117).climate,'Holocene interglacial');
 for(const age of [0,.01,.1,1,5])assert(!/human|hominin|sapiens/i.test(JSON.stringify(lifeAt(age))),'Earth biosphere overlay must stay separate from Human Odyssey');
+for(const [id,period] of [['ordovician','Ordovician'],['devonian','Devonian'],['permian','Permian'],['triassic','Triassic'],['kpg','Cretaceous']])assert.equal(chapterChronology(events.find(e=>e.id===id)).period,period,`${id} chapter must use its ending period`);
 console.log(`PASS: ${scales.length} time scales, 4,005 round-trip positions, geological boundaries, ${events.length} sourced chapters, 5 extinctions, sea-level anchors, 109 elevation rasters, coordinate orientation plate geometry, Cryogenian surface/context agreement and Earth-only biosphere text.`);

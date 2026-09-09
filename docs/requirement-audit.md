@@ -44,7 +44,7 @@ Browser checks: desktop 1280×800 and 1440×1000, phone 390×844; no horizontal 
 
 ## Current publication
 
-Private version 8 is the last confirmed publication before this audit update. It includes the engraved brand and verified chapter-panel scroll reset. New scientific-context changes are pending publication. A deployment success proves delivery, not visual or scientific completeness.
+Private version 9 is the last confirmed publication before this audit update. It includes the engraved brand, verified chapter-panel scroll reset, early-Earth surface differentiation, aligned Cryogenian context and Earth-only biosphere copy. A deployment success proves delivery, not visual or scientific completeness.
 
 ## Next priorities
 
@@ -62,3 +62,5 @@ Early Earth previously reused almost unchanged terrain above 540 Ma. Geometry, b
 ## Scientific-context regression pass — 2026-09-09
 
 Shared Cryogenian ice timing now drives the renderer instead of duplicating GLSL dates. Environment labels distinguish Sturtian, nonglacial interval and Marinoan. Two sourced chapters explain the interval and later freeze. Precambrian comparison copy explicitly distinguishes illustrations from PaleoDEM reconstructions. Earth-only biosphere descriptions replace the residual hominin narrative; Human Odyssey retains human content. Holocene environmental classification uses the same 11.7 ka boundary as the geological hierarchy. Automated checks cover ice at 700/680/640/638 Ma, no ice in the modeled interval, label agreement, and the Earth-only biosphere invariant. Earlier table rows describe the baseline and must be interpreted with the dated refinements above; they are not a claim of current full completion.
+
+Boundary-extinction chapter context now uses the geological period that ends at each formal boundary. The Great Dying therefore opens as Permian rather than Mesozoic, the end-Triassic event as Triassic, and the K–Pg event as Cretaceous. The Great Dying event anchor and certainty text use the high-precision marine extinction onset of approximately 251.941 Ma, while retaining explicit uncertainty for terrestrial timing and loss estimates. Browser verification confirmed the Great Dying sheet opens at scroll position zero, focuses its title, shows the Permian badge and produces no console errors.

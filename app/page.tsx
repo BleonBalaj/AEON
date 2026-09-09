@@ -1,88 +1,1534 @@
 'use client';
-import {useState,useEffect,useRef,useCallback} from 'react';
-import {Orbit,Play,Pause,Search,ArrowUpRight,ChevronRight,ChevronLeft,Globe2,Layers3,Leaf,Snowflake,Route,Users,Landmark,Compass,Plus,Minus,RotateCcw,Maximize2,Info,BookOpen,Clock3,Mountain,Wind,ExternalLink,SlidersHorizontal,GitCompareArrows,Check,Flame,Activity} from 'lucide-react';
-import Globe,{GlobeApi,Layers} from '@/components/earth-globe';
-import {Slider} from '@/components/ui/slider';
-import {Switch} from '@/components/ui/switch';
-import {Sheet,SheetContent,SheetHeader,SheetTitle,SheetDescription} from '@/components/ui/sheet';
-import {Dialog,DialogContent,DialogHeader,DialogTitle,DialogDescription} from '@/components/ui/dialog';
-import {Select,SelectTrigger,SelectValue,SelectContent,SelectItem} from '@/components/ui/select';
-import {Command,CommandInput,CommandList,CommandEmpty,CommandGroup,CommandItem} from '@/components/ui/command';
-import {events as allEvents,EarthEvent,Category,chronology,formatAge,scales,toPosition,fromPosition,environment,featured,sources,lifeAt,seaLevel} from '@/lib/earth/history';
-const events=allEvents.filter(e=>!['Humanity','Migration','Civilization'].includes(e.category));
-const nearestEvent=(age:number)=>events.reduce((best,event)=>Math.abs(toPosition(event.age,0)-toPosition(age,0))<Math.abs(toPosition(best.age,0)-toPosition(age,0))?event:best,events[0]);
-const categoryIcon:Record<Category,typeof Globe2>={Planet:Globe2,Life:Leaf,Climate:Snowflake,Extinction:Flame,Humanity:Users,Migration:Route,Civilization:Landmark};
-const layerDefs:{key:keyof Layers;name:string;icon:typeof Globe2;help:string}[]=[
-{key:'clouds',name:'Atmosphere & clouds',icon:Wind,help:'Illustrative cloud patterns, not reconstructed weather.'},
-{key:'plates',name:'Plate tectonics',icon:Layers3,help:'PB2002 present-day boundaries. Ancient views show reconstructed land and oceans, not invented plate boundaries.'},
-{key:'climate',name:'Climate context',icon:Activity,help:'Schematic latitude bands, not a measured temperature map. Read the climate description for the selected time.'},
-{key:'ice',name:'Ice & ancient coastlines',icon:Snowflake,help:'Approximate ice caps; glacial shelves use coarse modern bathymetry and a coarse interpolation between published sea-level anchors; exact local coastlines are uncertain.'},
-{key:'life',name:'Life & evolution',icon:Leaf,help:'Life chapters and geographically meaningful recent fossil-region markers. Ancient fossil sites are described in their chapters.'},
-{key:'grid',name:'Latitude & longitude',icon:Compass,help:'A coordinate reference grid. Ancient longitudes carry substantial uncertainty.'}
+import { useState, useEffect, useRef, useCallback } from 'react';
+import {
+  Orbit,
+  Play,
+  Pause,
+  Search,
+  ArrowUpRight,
+  ChevronRight,
+  ChevronLeft,
+  Globe2,
+  Layers3,
+  Leaf,
+  Snowflake,
+  Route,
+  Users,
+  Landmark,
+  Compass,
+  Plus,
+  Minus,
+  RotateCcw,
+  Maximize2,
+  Info,
+  BookOpen,
+  Clock3,
+  Mountain,
+  Wind,
+  ExternalLink,
+  SlidersHorizontal,
+  GitCompareArrows,
+  Check,
+  Flame,
+  Activity,
+} from 'lucide-react';
+import Globe, { GlobeApi, Layers } from '@/components/earth-globe';
+import { Slider } from '@/components/ui/slider';
+import { Switch } from '@/components/ui/switch';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from '@/components/ui/sheet';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from '@/components/ui/select';
+import {
+  Command,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+} from '@/components/ui/command';
+import {
+  events as allEvents,
+  EarthEvent,
+  Category,
+  chronology,
+  chapterChronology,
+  formatAge,
+  scales,
+  toPosition,
+  fromPosition,
+  environment,
+  featured,
+  sources,
+  lifeAt,
+  seaLevel,
+} from '@/lib/earth/history';
+const events = allEvents.filter(
+  (e) => !['Humanity', 'Migration', 'Civilization'].includes(e.category),
+);
+const nearestEvent = (age: number) =>
+  events.reduce(
+    (best, event) =>
+      Math.abs(toPosition(event.age, 0) - toPosition(age, 0)) <
+      Math.abs(toPosition(best.age, 0) - toPosition(age, 0))
+        ? event
+        : best,
+    events[0],
+  );
+const categoryIcon: Record<Category, typeof Globe2> = {
+  Planet: Globe2,
+  Life: Leaf,
+  Climate: Snowflake,
+  Extinction: Flame,
+  Humanity: Users,
+  Migration: Route,
+  Civilization: Landmark,
+};
+const layerDefs: {
+  key: keyof Layers;
+  name: string;
+  icon: typeof Globe2;
+  help: string;
+}[] = [
+  {
+    key: 'clouds',
+    name: 'Atmosphere & clouds',
+    icon: Wind,
+    help: 'Illustrative cloud patterns, not reconstructed weather.',
+  },
+  {
+    key: 'plates',
+    name: 'Plate tectonics',
+    icon: Layers3,
+    help: 'PB2002 present-day boundaries. Ancient views show reconstructed land and oceans, not invented plate boundaries.',
+  },
+  {
+    key: 'climate',
+    name: 'Climate context',
+    icon: Activity,
+    help: 'Schematic latitude bands, not a measured temperature map. Read the climate description for the selected time.',
+  },
+  {
+    key: 'ice',
+    name: 'Ice & ancient coastlines',
+    icon: Snowflake,
+    help: 'Approximate ice caps; glacial shelves use coarse modern bathymetry and a coarse interpolation between published sea-level anchors; exact local coastlines are uncertain.',
+  },
+  {
+    key: 'life',
+    name: 'Life & evolution',
+    icon: Leaf,
+    help: 'Life chapters and geographically meaningful recent fossil-region markers. Ancient fossil sites are described in their chapters.',
+  },
+  {
+    key: 'grid',
+    name: 'Latitude & longitude',
+    icon: Compass,
+    help: 'A coordinate reference grid. Ancient longitudes carry substantial uncertainty.',
+  },
 ];
-const defaults:Layers={clouds:true,plates:false,climate:false,ice:true,life:false,humans:false,migration:false,civilization:false,grid:false};
-export default function Home(){
- const [age,setAge]=useState(0),[scale,setScale]=useState(0),[playing,setPlaying]=useState(false),[speed,setSpeed]=useState('Normal'),[started,setStarted]=useState(false),[selected,setSelected]=useState<EarthEvent|null>(null),[layers,setLayers]=useState<Layers>(defaults),[autoRotate,setAutoRotate]=useState(true),[status,setStatus]=useState('');
- const [drawer,setDrawer]=useState<'eras'|'layers'|'details'|'sources'|null>(null),[search,setSearch]=useState(false),[query,setQuery]=useState(''),[category,setCategory]=useState('All chapters'),[compression,setCompression]=useState(false),[compressUnit,setCompressUnit]=useState('24 hours'),[compare,setCompare]=useState(false),[savedAge,setSavedAge]=useState<number|null>(null),[full,setFull]=useState(false);
- const buffering=useRef(false);const onBuffering=useCallback((waiting:boolean)=>{buffering.current=waiting;},[]);
- const api=useRef<GlobeApi|null>(null),ageRef=useRef(age),scaleRef=useRef(scale);ageRef.current=age;scaleRef.current=scale;
- const story=selected??nearestEvent(age),time=chronology(age),conditions=environment(age);const isExtinction=story.category==='Extinction'&&Math.abs(toPosition(age,0)-toPosition(story.age,0))<.6;
- const biosphere=lifeAt(age);
- const position=toPosition(age,scale),keyChapters=featured.map(id=>events.find(e=>e.id===id)).filter((e):e is EarthEvent=>!!e);
- const jump=useCallback((event:EarthEvent,details=false)=>{setPlaying(false);setStarted(true);setAge(event.age);setSelected(event);setScale(event.age<=.012?4:event.age<=.3?3:event.age<=10?2:event.age<=540?1:0);if(event.location)api.current?.focus(...event.location);setLayers(l=>({...l,life:event.category==='Life'||l.life}));if(details)setDrawer('details');else setDrawer(null);setSearch(false);},[]);
- const startJourney=()=>{setStarted(true);setAge(4540);setScale(0);setSelected(null);setPlaying(true);api.current?.reset();};
- const scrub=(p:number)=>{setPlaying(false);setStarted(true);setSelected(null);setAge(fromPosition(p,scale));};
- useEffect(()=>{if(!playing)return;let frame=0,last=0;const duration=({Cinematic:260,Normal:150,Fast:70,'Very fast':35} as Record<string,number>)[speed];let lastCommit=0;const tick=(now:number)=>{if(!last)last=now;const dt=Math.min(now-last,100);last=now;if(buffering.current){frame=requestAnimationFrame(tick);return;}const pos=toPosition(ageRef.current,scaleRef.current)+dt/(duration*10);const next=fromPosition(Math.min(100,pos),scaleRef.current);ageRef.current=next;if(now-lastCommit>65){setAge(next);setSelected(null);lastCommit=now;}if(pos>=100){setPlaying(false);setAge(0);return;}frame=requestAnimationFrame(tick);};frame=requestAnimationFrame(tick);return()=>cancelAnimationFrame(frame);},[playing,speed,scale]);
- useEffect(()=>{const fn=(e:KeyboardEvent)=>{if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();setSearch(v=>!v);}if(e.code==='Space'&&e.target===document.body&&!drawer&&!search&&!compression&&!compare){e.preventDefault();setPlaying(v=>!v);}};window.addEventListener('keydown',fn);return()=>window.removeEventListener('keydown',fn);},[drawer,search,compression,compare]);
- useEffect(()=>{const fn=()=>setFull(!!document.fullscreenElement);document.addEventListener('fullscreenchange',fn);return()=>document.removeEventListener('fullscreenchange',fn);},[]);
- useEffect(()=>{type Tool={name:string;description:string;inputSchema:object;annotations:{readOnlyHint:boolean};execute:(input:unknown)=>unknown};const context=(document as Document&{modelContext?:{registerTool:(t:Tool,o:{signal:AbortSignal})=>void}}).modelContext;if(!context?.registerTool)return;const lifecycle=new AbortController();try{context.registerTool({name:'explore_earth_time',description:'Navigate the Earth explorer to a time in millions of years before present, from 0 to 4540.',inputSchema:{type:'object',properties:{millionYearsAgo:{type:'number',minimum:0,maximum:4540}},required:['millionYearsAgo'],additionalProperties:false},annotations:{readOnlyHint:false},execute:async(input)=>{const value=(input as {millionYearsAgo?:unknown})?.millionYearsAgo;if(typeof value!=='number'||!Number.isFinite(value)||value<0||value>4540)throw Error('millionYearsAgo must be a finite number from 0 to 4540.');setPlaying(false);setStarted(true);setSelected(null);setAge(value);setScale(value<=.012?4:value<=.3?3:value<=10?2:value<=540?1:0);await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));return {millionYearsAgo:value,...chronology(value)};}},{signal:lifecycle.signal});context.registerTool({name:'read_earth_time',description:'Read the currently selected time and its geological classification.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true},execute:()=>({millionYearsAgo:ageRef.current,...chronology(ageRef.current)})},{signal:lifecycle.signal});}catch{}return()=>lifecycle.abort();},[]);
- function changeScale(n:number){setPlaying(false);setScale(n);setSelected(null);if(age>scales[n].max)setAge(scales[n].max);setStarted(true);}
- const toggleLayer=(key:keyof Layers,value:boolean)=>{setLayers(l=>({...l,[key]:value}));};
- const openDetails=()=>{setPlaying(false);setDrawer('details');};
- const playPause=()=>{if(age===0&&!playing){setAge(scales[scale].max);setSelected(null);}setStarted(true);setPlaying(v=>!v);};
- const ready=useCallback((a:GlobeApi)=>{api.current=a;},[]);
- const filteredEvents=events.filter(e=>category==='All chapters'||e.category===category);
- const timeLabels=scale===0?[{p:0,t:'4.54 Ga'},{p:15,t:'2.5 Ga'},{p:35,t:'540 Ma'},{p:55,t:'100 Ma'},{p:75,t:'300 ka'},{p:100,t:'Now'}]:[0,25,50,75,100].map(p=>({p,t:p===100?'Now':formatAge(fromPosition(p,scale),true)}));
- const visibleMarkers=events.filter(e=>e.age<=scales[scale].max).filter((e,i)=>scale===0?featured.includes(e.id):scale===1?e.age>10:scale===2?e.age>.3:scale===3?e.age>.012:true);
- return <main className={`atlas ${started?'exploring':''} ${isExtinction?'extinction-world':''}`}>
- <a className="skip-link" href="#time-control">Skip to timeline</a>
- <div className="chamber"><header className="topbar"><a className="brand" href="/" aria-label="AEON home"><Orbit size={30}/><span>AEON</span></a><span className="brand-note">A LIVING HISTORY<br/>OF EARTH</span><nav aria-label="Main navigation"><button className="active" onClick={()=>setDrawer(null)}><Globe2 size={15}/>Explore Earth</button><a href="/human-odyssey"><Users size={15}/>Human Odyssey</a><button onClick={()=>setDrawer('eras')}><Clock3 size={15}/>Era explorer</button><button onClick={()=>setDrawer('sources')}><BookOpen size={15}/>About the atlas</button></nav><button className="search-button" onClick={()=>setSearch(true)} aria-label="Search Earth's history"><Search size={17}/><span>Search history</span><kbd>⌘ K</kbd></button></header>
- <section className="workspace" aria-label="Earth visualization">
- <Globe age={age} layers={layers} selected={selected} onSelect={e=>jump(e,true)} onReady={ready} autoRotate={autoRotate} onStatus={setStatus} onBuffering={onBuffering}/>
- <div className="intro"><div className="eyebrow"><span className="live-dot"/> {started?`${time.eon.toUpperCase()} EON`:'THE STORY OF OUR HOME'}</div><h1>{started?<>{story.title.split(' ').slice(0,3).join(' ')}<br/><em>{story.title.split(' ').slice(3).join(' ')}</em></>:<>One planet.<br/><em>Countless worlds.</em></>}</h1><p>{started?story.description:<>Travel through 4.54 billion years of change.<br/>Every world before us. Every step that led here.</>}</p>{started?<button className="text-link" onClick={openDetails}>Discover this chapter <ArrowUpRight size={16}/></button>:<button className="primary" onClick={startJourney}><Play size={15} fill="currentColor"/> Begin the journey</button>}<div className="intro-foot">{started?formatAge(age).toUpperCase():'THE PAST IS ANOTHER WORLD. EXPLORE IT.'}</div>
- </div>
- {layers.life&&<div className="life-overlay"><Leaf size={14}/><div><span>LIFE AT THIS TIME</span><strong>{biosphere.title}</strong><p>{biosphere.text}</p></div></div>}
- <div className="globe-caption"><span className="live-dot"/> {age>540?(age>4460?'ILLUSTRATION · COOLING EARTH':age>4031?'ILLUSTRATION · EARLY OCEANS & CRUST':age>2500?'ILLUSTRATION · ARCHEAN CONTINENTAL CORES':age<=720&&age>=635?`ILLUSTRATION · ${conditions.climate.toUpperCase()}`:'ILLUSTRATION · PRECAMBRIAN WORLD'):age>.12?'PALEOMAP SCIENTIFIC RECONSTRUCTION':age>.012&&layers.ice?'APPROXIMATE GLACIAL GEOGRAPHY':'NASA BLUE MARBLE · MODERN EARTH'}<span className="caption-sub">{status||(age>540?'Land positions and surface colors are illustrative':'Drag to rotate · Scroll or pinch to zoom')}</span></div>
- <aside className="context"><div className="context-heading"><span className="eyebrow">{started?'WORLD AT A GLANCE':'YOU ARE EXPLORING'}</span><button aria-label="About this reconstruction" onClick={()=>setDrawer('sources')}><Info size={14}/></button></div>{!started&&<><h2>The world we know</h2><p>A fleeting moment in a remarkable planetary story.</p></>}<div className="planet-facts"><div><Mountain size={15}/><span>Continents<strong>{conditions.land}</strong></span></div><div><Activity size={15}/><span>{age>0&&age<=.125&&layers.ice?'Sea level · illustrative':'Climate'}<strong>{age>0&&age<=.125&&layers.ice?`~${Math.round(seaLevel(age)/5)*5} m vs. today`:conditions.climate}</strong></span></div><div><Wind size={15}/><span>Atmosphere<strong>{conditions.air}</strong></span></div></div><hr/><div className="context-heading"><span className="eyebrow">PLANET LAYERS</span><button onClick={()=>setDrawer('layers')} aria-label="All visualization layers"><SlidersHorizontal size={14}/></button></div>{layerDefs.filter(l=>['plates','life','ice'].includes(l.key)).map(l=><label className="layer-row" key={l.key}><l.icon size={15}/><span>{l.name}</span><Switch size="sm" checked={layers[l.key]} onCheckedChange={v=>toggleLayer(l.key,v)}/></label>)}<button className="all-layers" onClick={()=>setDrawer('layers')}>All layers <ChevronRight size={14}/></button>{layers.plates&&age>.3&&<p className="layer-notice">Modern plate boundaries are hidden in ancient views.</p>}{layers.migration&&<p className="layer-notice">{age>.3?'Migration appears within the last 300,000 years.':'Dashed routes show approximate connections, not exact paths.'}</p>}{layers.climate&&<p className="layer-notice">Latitude bands are illustrative, not temperature measurements.</p>}</aside>
- <div className="view-toolbar" aria-label="Globe controls"><button aria-label="Zoom in" title="Zoom in" onClick={()=>api.current?.zoom(.85)}><Plus size={18}/></button><button aria-label="Zoom out" title="Zoom out" onClick={()=>api.current?.zoom(1.15)}><Minus size={18}/></button><span/><button aria-label="Reset globe view" title="Reset view" onClick={()=>api.current?.reset()}><RotateCcw size={16}/></button><button aria-label={autoRotate?'Stop globe rotation':'Start globe rotation'} aria-pressed={autoRotate} title="Auto rotation" className={autoRotate?'on':''} onClick={()=>setAutoRotate(v=>!v)}><Orbit size={17}/></button><button aria-label={full?'Exit full screen':'Full screen'} title="Full screen" onClick={async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen();}catch{setStatus('Full screen is unavailable in this preview.');}}}><Maximize2 size={16}/></button></div>
- <button className="mobile-layer-toggle" onClick={()=>setDrawer('layers')}><Layers3 size={17}/> Layers</button>
- <div className="bottom-workspace"><button onClick={()=>setCompression(true)}><Clock3 size={14}/><span>Earth in a day</span></button><span className="orientation">N <span>↑</span></span><button onClick={()=>{setSavedAge(age);setCompare(true);}}><GitCompareArrows size={14}/><span>Compare worlds</span></button></div>
- </section>
- <section className="time-panel" id="time-control" data-playing={playing} aria-label="Time travel controls"><svg className="console-shell" viewBox="0 0 1200 220" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="console-glass" x2="0" y2="1"><stop stopColor="#a5b8b8" stopOpacity=".09"/><stop offset=".45" stopColor="#071012" stopOpacity=".78"/><stop offset="1" stopColor="#101716" stopOpacity=".5"/></linearGradient><linearGradient id="console-rim"><stop stopColor="#667a7d" stopOpacity=".1"/><stop offset=".3" stopColor="#c4d6d8" stopOpacity=".7"/><stop offset=".5" stopColor="#f0dfb9"/><stop offset=".7" stopColor="#c4d6d8" stopOpacity=".7"/><stop offset="1" stopColor="#667a7d" stopOpacity=".1"/></linearGradient></defs><path d="M 0 40 Q 245 8 475 19 Q 600 -14 725 19 Q 955 8 1200 40 L 1178 211 Q 600 227 22 211 Z" fill="url(#console-glass)" stroke="#cbd4c02a"/><path d="M 0 40 Q 245 8 475 19 Q 600 -14 725 19 Q 955 8 1200 40" fill="none" stroke="url(#console-rim)" strokeWidth="1.4"/><path d="M 34 213 Q 600 227 1166 213" fill="none" stroke="url(#console-rim)" strokeOpacity=".4"/><path d="M 17 44 Q 245 17 475 25 Q 600 -6 725 25 Q 955 17 1183 44" fill="none" stroke="url(#console-rim)" strokeOpacity=".2"/><path d="M 13 55 L 32 191 M 1187 55 L 1168 191" fill="none" stroke="#b7dce4" strokeOpacity=".18" strokeWidth=".7"/></svg><div className="time-head"><div className="date-block"><span className="eyebrow">YOUR PLACE IN TIME</span><strong aria-live={playing?'off':'polite'}>{formatAge(age)}</strong><span className="epoch-line">{[time.eon,time.era,time.period,time.epoch].filter(Boolean).join(' / ')}</span></div><div className="timeline-actions"><div className="scale-picker"><span>TIME SCALE</span><Select value={String(scale)} onValueChange={v=>changeScale(Number(v))}><SelectTrigger aria-label="Timeline scale"><SelectValue>{scale===3?'Ice age':scale===4?'Recent Earth':scales[scale].name}</SelectValue></SelectTrigger><SelectContent>{scales.map((s,i)=><SelectItem key={s.name} value={String(i)}>{i===3?'Ice age':i===4?'Recent Earth':s.name}</SelectItem>)}</SelectContent></Select></div><div className="play-controls"><button className="step-button" aria-label="Previous milestone" onClick={()=>{const e=[...events].reverse().find(e=>e.age>age+.0000001);if(e)jump(e);}} disabled={age>=4540}><ChevronLeft size={17}/></button><button className="play-button" onClick={playPause} aria-label={playing?'Pause history':'Play Earth history'}>{playing?<Pause size={17} fill="currentColor"/>:<Play size={17} fill="currentColor"/>}</button><button className="step-button" aria-label="Next milestone" onClick={()=>{const e=events.find(e=>e.age<age-.0000001);if(e)jump(e);}} disabled={age===0}><ChevronRight size={17}/></button><Select value={speed} onValueChange={v=>v&&setSpeed(v)}><SelectTrigger aria-label="Playback speed" className="speed-select"><SelectValue/></SelectTrigger><SelectContent>{['Cinematic','Normal','Fast','Very fast'].map(s=><SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent></Select></div></div></div>
- <div className="timeline-track"><div className="event-ticks" aria-label="Milestones on the timeline">{visibleMarkers.map(e=><button key={e.id} className={e.category==='Extinction'?'extinction-tick':''} style={{left:`${toPosition(e.age,scale)}%`}} title={`${e.title} · ${e.date}`} aria-label={`Jump to ${e.title}`} onClick={()=>jump(e)}><span/></button>)}</div><Slider aria-label="Time travel position" min={0} max={100} step={.01} value={[position]} onValueChange={v=>scrub(Array.isArray(v)?v[0]:v)}/><div className="timeline-labels">{timeLabels.map(x=><span key={x.p} style={{left:`${x.p}%`,transform:x.p===0?'none':x.p===100?'translateX(-100%)':'translateX(-50%)'}}>{x.t}</span>)}</div></div>
- <div className="eon-strip" style={{gridTemplateColumns:scale===0?'1fr 2fr 4fr 13fr':scale===1?'289fr 186fr 66fr':'1fr'}}>{(scale===0?[['Hadean',4500],['Archean',3500],['Proterozoic',1500],['Phanerozoic',280]]:scale===1?[['Paleozoic',400],['Mesozoic',150],['Cenozoic',20]]:[[scale===3?'Ice age':scale===4?'Recent Earth':scales[scale].name,scales[scale].max/2]]).map(([name,target])=><button key={name} onClick={()=>{setAge(Number(target));setStarted(true);setSelected(null);setPlaying(false);}}>{name}</button>)}</div><div className="timeline-foot"><span>{scale===0?'Adaptive scale · Recent history is expanded for exploration':'Linear scale within this time window'} {playing&&' · Playing'}</span><button onClick={()=>setDrawer('eras')}>Jump to a chapter <ChevronRight size={12}/></button></div></section>
- </div><section className="chapter-shelf" aria-label="Featured chapters"><div className="shelf-title"><span className="eyebrow">WORLDS BEFORE OURS</span><button onClick={()=>setDrawer('eras')}>Explore all <ArrowUpRight size={13}/></button></div><div className="chapter-row">{keyChapters.slice(0,8).map((e,i)=>{const Icon=categoryIcon[e.category];return <button key={e.id} className={`chapter-card chapter-${e.id} ${story.id===e.id?'selected':''}`} onClick={()=>jump(e)}><div className="chapter-art"><Icon size={21}/></div><span><small>{formatAge(e.age,true)}</small><strong>{e.id==='formation'?'Earth is born':e.id==='life'?'First life':e.id==='snowball'?'Snowball Earth':e.id==='cambrian'?'Cambrian life':e.id==='pangaea'?'Pangaea':e.id==='jurassic'?'Age of giants':e.id==='kpg'?'The last dinosaurs':'Homo sapiens'}</strong></span><ChevronRight size={12}/></button>})}</div></section>
- <footer className="atlas-footer"><span>ONE PLANET. AN EXTRAORDINARY STORY.</span><button onClick={()=>setDrawer('sources')}><BookOpen size={12}/> Science, sources & uncertainty</button></footer>
- <Sheet open={drawer!==null} onOpenChange={v=>!v&&setDrawer(null)}><SheetContent scrollResetKey={`${drawer}:${story.id}`} className="atlas-sheet" side="right"><SheetHeader><SheetTitle>{drawer==='eras'?'Explore the ages':drawer==='layers'?'A different view of Earth':drawer==='sources'?'An atlas grounded in evidence':story.title}</SheetTitle><SheetDescription>{drawer==='eras'?'Every chapter opens another world.':drawer==='layers'?'Choose what the planet reveals.':drawer==='sources'?'Scientific reconstructions, honest uncertainties.':story.date}</SheetDescription></SheetHeader><div className="sheet-body">
- {drawer==='eras'&&<><div className="category-filters">{['All chapters','Planet','Life','Climate','Extinction'].map(c=><button key={c} className={category===c?'active':''} onClick={()=>setCategory(c)}>{c}</button>)}</div><div className="era-list">{filteredEvents.map(e=>{const Icon=categoryIcon[e.category];return <button key={e.id} onClick={()=>jump(e)}><Icon size={19}/><span><small>{e.date}</small><strong>{e.title}</strong></span><ChevronRight size={16}/></button>})}</div></>}
- {drawer==='layers'&&<div className="layer-catalog">{layerDefs.map(l=><div key={l.key}><label><l.icon size={18}/><strong>{l.name}</strong><Switch checked={layers[l.key]} onCheckedChange={v=>toggleLayer(l.key,v)}/></label><p>{l.help}</p>{l.key==='plates'&&layers.plates&&age>.3&&<button className="text-link" onClick={()=>jump(events.find(e=>e.id==='present')!)}>View modern boundaries <ArrowUpRight size={14}/></button>}</div>)}</div>}
- {drawer==='details'&&<><div className="detail-badges"><span>{story.category}</span><span>{chronology(story.age).era||chronology(story.age).eon}</span></div><h3>What happened</h3><p>{story.description}</p><h3>Why it matters</h3><p>{story.importance}</p><h3>Where it happened</h3><p>{story.place}</p><div className="evidence-box"><Info size={18}/><div><h3>Evidence & scientific certainty</h3><p>{story.certainty}</p></div></div>{story.category==='Migration'&&<><h3>Routes are not a single story</h3><p>Dashed connections represent broad population movements. Populations branched, moved repeatedly and exchanged ancestry. Dates do not establish one definite path.</p></>}{story.id==='ice-age'&&<><h3>A coastline changes the journey</h3><p>Sunda and Sahul expose wider land areas, while deep channels through Wallacea remain. Ice sheets can make a land connection inaccessible. Our 1° elevation grid cannot resolve every strait or coastal corridor.</p></>}<h3>Sources</h3><SourceLinks ids={story.sources}/><h3>Continue exploring</h3><div className="related">{events.filter(e=>e.id!==story.id).sort((a,b)=>Math.abs(toPosition(a.age,0)-toPosition(story.age,0))-Math.abs(toPosition(b.age,0)-toPosition(story.age,0))).slice(0,3).map(e=><button key={e.id} onClick={()=>jump(e,true)}>{e.title}<ChevronRight size={14}/></button>)}</div></>}
- {drawer==='sources'&&<><p>AEON is an exploratory atlas of Earth’s history. The planet changes using scientific data where it is available, with explicit distinctions between observations, reconstructions and illustrations.</p><h3>Modern Earth</h3><p>NASA Blue Marble Next Generation, July 2004. A cloud-free satellite composite, not a live view. Clouds, atmosphere and lighting are illustrative.</p><h3>540 million years of changing geography</h3><p>109 elevation grids from Scotese & Wright (2018), generally at 5-million-year intervals and 1° spatial resolution. Land, shallow seas and ocean depths derive from these grids. Interpolation blends reconstructed elevations; it is not a continuous plate-motion solution. Colors are a terrain treatment, not evidence of actual vegetation.</p><h3>Before 540 million years ago</h3><p>Procedural worlds distinguish cooling crust, early oceans, growing continental cores and later Precambrian worlds. Coastlines, exposed land fractions, surface colors and cloud cover are qualitative illustrations, not measured reconstructions. Zircon evidence supports liquid water by about 4.4 billion years ago; the timing and extent of early oceans remain uncertain. The cooling transition is schematic. Cryogenian ice is shown in two approximate episodes (717–659 and about 645–635 million years ago), separated by a nonglacial interval. The Marinoan onset is uncertain; ice extent and visual transitions are schematic. Proposed Vaalbara, Kenorland, Nuna, Rodinia and Pannotia configurations are discussed as hypotheses, not drawn as settled fact.</p><h3>Ice ages and human migrations</h3><p>Shelf exposure uses a coarse modern elevation grid with an illustrative interpolation between published anchors: about −120 m at 21,000 years, −75 m at 50,000 years and −85 m at 65,000 years ago. Ice regions are schematic. Routes show broad dispersal connections, not a measured sequence; coastal detail, ice barriers and competing hypotheses require specialist regional maps.</p><h3>Dates and uncertainty</h3><p>Dates are approximate, expressed in years before present for navigation. The geological hierarchy follows the ICS 2024/12 chart, including the 4031 Ma Archean boundary; boundaries can be revised. BCE dates are rounded for ancient civilizations. Climate descriptions are qualitative: no unsupported temperature, oxygen or CO₂ series is implied.</p><h3>Data credits</h3><p>PALEOMAP PaleoDEMs: Scotese, C.R. & Wright, N. (2018), CC BY 4.0. Elevation encoding, rendering and interpolation adapted. Modern plate boundaries: Peter Bird (2003), converted by Hugo Ahlenius, ODC Attribution License. NASA imagery is acknowledged without implying endorsement.</p><SourceLinks ids={['cryogenian','earlyClimate','earlyWater','paleo','nasa','plates','ics','human','migration','sahul','sea','usgs','life','oxygen','snow','kpg','agriculture']}/><h3>Controls & accessibility</h3><p>Drag the globe to rotate; pinch or scroll to zoom. Focus the globe and use arrow keys to rotate. The timeline supports arrow keys, Home and End. Space plays or pauses when the page body is focused. Ctrl/⌘ K opens search. Reduced-motion preferences disable automatic globe rotation and ease effects.</p></>}
- </div></SheetContent></Sheet>
- <Dialog open={search} onOpenChange={setSearch}><DialogContent className="search-dialog"><DialogHeader><DialogTitle>Find a moment in Earth’s history</DialogTitle><DialogDescription>Search an event, period, organism or place.</DialogDescription></DialogHeader><Command filter={(value,search)=>search.toLowerCase().trim().split(/\s+/).every(word=>value.toLowerCase().includes(word))?1:0}><CommandInput value={query} onValueChange={setQuery} placeholder="Try Pangaea, dinosaurs, or ice ages…" aria-label="Search historical events"/><CommandList><CommandEmpty>No matching chapters. Try “life”, “ice” or “Pangaea”.</CommandEmpty><CommandGroup heading={query?'Matching chapters':'Explore a chapter'}>{events.map(e=>{const Icon=categoryIcon[e.category];return <CommandItem key={e.id} value={`${e.id} ${e.place} ${e.title} ${e.keywords||''} ${e.category} ${e.description}`} onSelect={()=>jump(e,true)}><Icon size={17}/><span>{e.title}<small>{formatAge(e.age,true)}</small></span><ArrowUpRight size={14}/></CommandItem>})}</CommandGroup></CommandList></Command></DialogContent></Dialog>
- <Dialog open={compression} onOpenChange={setCompression}><DialogContent className="compression-dialog"><DialogHeader><DialogTitle>All of Earth. One fleeting moment.</DialogTitle><DialogDescription>If Earth’s 4.54-billion-year history fit into {compressUnit==='24 hours'?'a single day':'one calendar year'}, when would its turning points occur?</DialogDescription></DialogHeader><div className="category-filters">{['24 hours','One year'].map(u=><button className={compressUnit===u?'active':''} key={u} onClick={()=>setCompressUnit(u)}>{u}</button>)}</div><div className="cosmic-clock"><Clock3 size={40}/><strong>{compressUnit==='24 hours'?'23:39:03':'December 26'}</strong><span>{compressUnit==='24 hours'?'The end-Cretaceous extinction falls in the final ~21 minutes.':'The end-Cretaceous extinction falls within the final six days.'}</span></div><div className="compression-events">{['life','oxygen','cambrian','dinosaurs','kpg','ice-age'].map(id=>{const e=events.find(e=>e.id===id)!;const fraction=1-e.age/4540;const seconds=Math.floor(fraction*86400);const clock=`${Math.floor(seconds/3600).toString().padStart(2,'0')}:${Math.floor(seconds%3600/60).toString().padStart(2,'0')}:${(seconds%60).toString().padStart(2,'0')}`;const date=new Date(Date.UTC(2025,0,1)+fraction*365*86400000);return <button key={id} onClick={()=>{setCompression(false);jump(e);}}><span>{e.title}</span><strong>{compressUnit==='24 hours'?clock:date.toLocaleDateString('en',{month:'short',day:'numeric',timeZone:'UTC'})}</strong></button>})}</div><p className="fine-print">An illustrative compression using approximate event ages. A year is treated as 365 days; this is a scale analogy, not a historical calendar.</p></DialogContent></Dialog>
- <Dialog open={compare} onOpenChange={setCompare}><DialogContent className="compare-dialog"><DialogHeader><DialogTitle>Two moments. One changing planet.</DialogTitle><DialogDescription>Pin one world, then compare its geography and environment with another chapter.</DialogDescription></DialogHeader><Select value={String(savedAge??0)} onValueChange={v=>setSavedAge(Number(v))}><SelectTrigger aria-label="Comparison world"><SelectValue>{formatAge(savedAge??0)}</SelectValue></SelectTrigger><SelectContent>{keyChapters.map(e=><SelectItem key={e.id} value={String(e.age)}>{e.title} · {formatAge(e.age,true)}</SelectItem>)}</SelectContent></Select><div className="compare-planets">{[savedAge??0,age===savedAge?280:age].map((a,i)=><div key={i}><div className="mini-globe"><Globe age={a} layers={{...defaults,clouds:false}} selected={null} onSelect={()=>{}} onReady={()=>{}} autoRotate={false} onStatus={()=>{}}/></div><strong>{formatAge(a)}</strong><span>{environment(a).land}</span><p>{environment(a).climate}</p><button className="text-link" onClick={()=>{setCompare(false);setStarted(true);setPlaying(false);setSelected(null);setScale(a<=540?1:0);setAge(a);}}>Explore this world <ArrowUpRight size={13}/></button></div>)}</div><p className="fine-print">Before 540 million years ago, landforms are illustrative. Later ancient geography uses PALEOMAP reconstructions; modern imagery is observed. Terrain colors are not directly comparable vegetation measurements.</p></DialogContent></Dialog>
- </main>;
+const defaults: Layers = {
+  clouds: true,
+  plates: false,
+  climate: false,
+  ice: true,
+  life: false,
+  humans: false,
+  migration: false,
+  civilization: false,
+  grid: false,
+};
+export default function Home() {
+  const [age, setAge] = useState(0),
+    [scale, setScale] = useState(0),
+    [playing, setPlaying] = useState(false),
+    [speed, setSpeed] = useState('Normal'),
+    [started, setStarted] = useState(false),
+    [selected, setSelected] = useState<EarthEvent | null>(null),
+    [layers, setLayers] = useState<Layers>(defaults),
+    [autoRotate, setAutoRotate] = useState(true),
+    [status, setStatus] = useState('');
+  const [drawer, setDrawer] = useState<
+      'eras' | 'layers' | 'details' | 'sources' | null
+    >(null),
+    [search, setSearch] = useState(false),
+    [query, setQuery] = useState(''),
+    [category, setCategory] = useState('All chapters'),
+    [compression, setCompression] = useState(false),
+    [compressUnit, setCompressUnit] = useState('24 hours'),
+    [compare, setCompare] = useState(false),
+    [savedAge, setSavedAge] = useState<number | null>(null),
+    [full, setFull] = useState(false);
+  const buffering = useRef(false);
+  const onBuffering = useCallback((waiting: boolean) => {
+    buffering.current = waiting;
+  }, []);
+  const api = useRef<GlobeApi | null>(null),
+    ageRef = useRef(age),
+    scaleRef = useRef(scale);
+  ageRef.current = age;
+  scaleRef.current = scale;
+  const story = selected ?? nearestEvent(age),
+    time = chronology(age),
+    conditions = environment(age);
+  const isExtinction =
+    story.category === 'Extinction' &&
+    Math.abs(toPosition(age, 0) - toPosition(story.age, 0)) < 0.6;
+  const biosphere = lifeAt(age);
+  const position = toPosition(age, scale),
+    keyChapters = featured
+      .map((id) => events.find((e) => e.id === id))
+      .filter((e): e is EarthEvent => !!e);
+  const jump = useCallback((event: EarthEvent, details = false) => {
+    setPlaying(false);
+    setStarted(true);
+    setAge(event.age);
+    setSelected(event);
+    setScale(
+      event.age <= 0.012
+        ? 4
+        : event.age <= 0.3
+          ? 3
+          : event.age <= 10
+            ? 2
+            : event.age <= 540
+              ? 1
+              : 0,
+    );
+    if (event.location) api.current?.focus(...event.location);
+    setLayers((l) => ({ ...l, life: event.category === 'Life' || l.life }));
+    if (details) setDrawer('details');
+    else setDrawer(null);
+    setSearch(false);
+  }, []);
+  const startJourney = () => {
+    setStarted(true);
+    setAge(4540);
+    setScale(0);
+    setSelected(null);
+    setPlaying(true);
+    api.current?.reset();
+  };
+  const scrub = (p: number) => {
+    setPlaying(false);
+    setStarted(true);
+    setSelected(null);
+    setAge(fromPosition(p, scale));
+  };
+  useEffect(() => {
+    if (!playing) return;
+    let frame = 0,
+      last = 0;
+    const duration = (
+      { Cinematic: 260, Normal: 150, Fast: 70, 'Very fast': 35 } as Record<
+        string,
+        number
+      >
+    )[speed];
+    let lastCommit = 0;
+    const tick = (now: number) => {
+      if (!last) last = now;
+      const dt = Math.min(now - last, 100);
+      last = now;
+      if (buffering.current) {
+        frame = requestAnimationFrame(tick);
+        return;
+      }
+      const pos =
+        toPosition(ageRef.current, scaleRef.current) + dt / (duration * 10);
+      const next = fromPosition(Math.min(100, pos), scaleRef.current);
+      ageRef.current = next;
+      if (now - lastCommit > 65) {
+        setAge(next);
+        setSelected(null);
+        lastCommit = now;
+      }
+      if (pos >= 100) {
+        setPlaying(false);
+        setAge(0);
+        return;
+      }
+      frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [playing, speed, scale]);
+  useEffect(() => {
+    const fn = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setSearch((v) => !v);
+      }
+      if (
+        e.code === 'Space' &&
+        e.target === document.body &&
+        !drawer &&
+        !search &&
+        !compression &&
+        !compare
+      ) {
+        e.preventDefault();
+        setPlaying((v) => !v);
+      }
+    };
+    window.addEventListener('keydown', fn);
+    return () => window.removeEventListener('keydown', fn);
+  }, [drawer, search, compression, compare]);
+  useEffect(() => {
+    const fn = () => setFull(!!document.fullscreenElement);
+    document.addEventListener('fullscreenchange', fn);
+    return () => document.removeEventListener('fullscreenchange', fn);
+  }, []);
+  useEffect(() => {
+    type Tool = {
+      name: string;
+      description: string;
+      inputSchema: object;
+      annotations: { readOnlyHint: boolean };
+      execute: (input: unknown) => unknown;
+    };
+    const context = (
+      document as Document & {
+        modelContext?: {
+          registerTool: (t: Tool, o: { signal: AbortSignal }) => void;
+        };
+      }
+    ).modelContext;
+    if (!context?.registerTool) return;
+    const lifecycle = new AbortController();
+    try {
+      context.registerTool(
+        {
+          name: 'explore_earth_time',
+          description:
+            'Navigate the Earth explorer to a time in millions of years before present, from 0 to 4540.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              millionYearsAgo: { type: 'number', minimum: 0, maximum: 4540 },
+            },
+            required: ['millionYearsAgo'],
+            additionalProperties: false,
+          },
+          annotations: { readOnlyHint: false },
+          execute: async (input) => {
+            const value = (input as { millionYearsAgo?: unknown })
+              ?.millionYearsAgo;
+            if (
+              typeof value !== 'number' ||
+              !Number.isFinite(value) ||
+              value < 0 ||
+              value > 4540
+            )
+              throw Error(
+                'millionYearsAgo must be a finite number from 0 to 4540.',
+              );
+            setPlaying(false);
+            setStarted(true);
+            setSelected(null);
+            setAge(value);
+            setScale(
+              value <= 0.012
+                ? 4
+                : value <= 0.3
+                  ? 3
+                  : value <= 10
+                    ? 2
+                    : value <= 540
+                      ? 1
+                      : 0,
+            );
+            await new Promise((resolve) =>
+              requestAnimationFrame(() => requestAnimationFrame(resolve)),
+            );
+            return { millionYearsAgo: value, ...chronology(value) };
+          },
+        },
+        { signal: lifecycle.signal },
+      );
+      context.registerTool(
+        {
+          name: 'read_earth_time',
+          description:
+            'Read the currently selected time and its geological classification.',
+          inputSchema: {
+            type: 'object',
+            properties: {},
+            additionalProperties: false,
+          },
+          annotations: { readOnlyHint: true },
+          execute: () => ({
+            millionYearsAgo: ageRef.current,
+            ...chronology(ageRef.current),
+          }),
+        },
+        { signal: lifecycle.signal },
+      );
+    } catch {}
+    return () => lifecycle.abort();
+  }, []);
+  function changeScale(n: number) {
+    setPlaying(false);
+    setScale(n);
+    setSelected(null);
+    if (age > scales[n].max) setAge(scales[n].max);
+    setStarted(true);
+  }
+  const toggleLayer = (key: keyof Layers, value: boolean) => {
+    setLayers((l) => ({ ...l, [key]: value }));
+  };
+  const openDetails = () => {
+    setPlaying(false);
+    setDrawer('details');
+  };
+  const playPause = () => {
+    if (age === 0 && !playing) {
+      setAge(scales[scale].max);
+      setSelected(null);
+    }
+    setStarted(true);
+    setPlaying((v) => !v);
+  };
+  const ready = useCallback((a: GlobeApi) => {
+    api.current = a;
+  }, []);
+  const filteredEvents = events.filter(
+    (e) => category === 'All chapters' || e.category === category,
+  );
+  const timeLabels =
+    scale === 0
+      ? [
+          { p: 0, t: '4.54 Ga' },
+          { p: 15, t: '2.5 Ga' },
+          { p: 35, t: '540 Ma' },
+          { p: 55, t: '100 Ma' },
+          { p: 75, t: '300 ka' },
+          { p: 100, t: 'Now' },
+        ]
+      : [0, 25, 50, 75, 100].map((p) => ({
+          p,
+          t: p === 100 ? 'Now' : formatAge(fromPosition(p, scale), true),
+        }));
+  const visibleMarkers = events
+    .filter((e) => e.age <= scales[scale].max)
+    .filter((e, i) =>
+      scale === 0
+        ? featured.includes(e.id)
+        : scale === 1
+          ? e.age > 10
+          : scale === 2
+            ? e.age > 0.3
+            : scale === 3
+              ? e.age > 0.012
+              : true,
+    );
+  return (
+    <main
+      className={`atlas ${started ? 'exploring' : ''} ${isExtinction ? 'extinction-world' : ''}`}
+    >
+      <a className="skip-link" href="#time-control">
+        Skip to timeline
+      </a>
+      <div className="chamber">
+        <header className="topbar">
+          <a className="brand" href="/" aria-label="AEON home">
+            <Orbit size={30} />
+            <span>AEON</span>
+          </a>
+          <span className="brand-note">
+            A LIVING HISTORY
+            <br />
+            OF EARTH
+          </span>
+          <nav aria-label="Main navigation">
+            <button className="active" onClick={() => setDrawer(null)}>
+              <Globe2 size={15} />
+              Explore Earth
+            </button>
+            <a href="/human-odyssey">
+              <Users size={15} />
+              Human Odyssey
+            </a>
+            <button onClick={() => setDrawer('eras')}>
+              <Clock3 size={15} />
+              Era explorer
+            </button>
+            <button onClick={() => setDrawer('sources')}>
+              <BookOpen size={15} />
+              About the atlas
+            </button>
+          </nav>
+          <button
+            className="search-button"
+            onClick={() => setSearch(true)}
+            aria-label="Search Earth's history"
+          >
+            <Search size={17} />
+            <span>Search history</span>
+            <kbd>⌘ K</kbd>
+          </button>
+        </header>
+        <section className="workspace" aria-label="Earth visualization">
+          <Globe
+            age={age}
+            layers={layers}
+            selected={selected}
+            onSelect={(e) => jump(e, true)}
+            onReady={ready}
+            autoRotate={autoRotate}
+            onStatus={setStatus}
+            onBuffering={onBuffering}
+          />
+          <div className="intro">
+            <div className="eyebrow">
+              <span className="live-dot" />{' '}
+              {started
+                ? `${time.eon.toUpperCase()} EON`
+                : 'THE STORY OF OUR HOME'}
+            </div>
+            <h1>
+              {started ? (
+                <>
+                  {story.title.split(' ').slice(0, 3).join(' ')}
+                  <br />
+                  <em>{story.title.split(' ').slice(3).join(' ')}</em>
+                </>
+              ) : (
+                <>
+                  One planet.
+                  <br />
+                  <em>Countless worlds.</em>
+                </>
+              )}
+            </h1>
+            <p>
+              {started ? (
+                story.description
+              ) : (
+                <>
+                  Travel through 4.54 billion years of change.
+                  <br />
+                  Every world before us. Every step that led here.
+                </>
+              )}
+            </p>
+            {started ? (
+              <button className="text-link" onClick={openDetails}>
+                Discover this chapter <ArrowUpRight size={16} />
+              </button>
+            ) : (
+              <button className="primary" onClick={startJourney}>
+                <Play size={15} fill="currentColor" /> Begin the journey
+              </button>
+            )}
+            <div className="intro-foot">
+              {started
+                ? formatAge(age).toUpperCase()
+                : 'THE PAST IS ANOTHER WORLD. EXPLORE IT.'}
+            </div>
+          </div>
+          {layers.life && (
+            <div className="life-overlay">
+              <Leaf size={14} />
+              <div>
+                <span>LIFE AT THIS TIME</span>
+                <strong>{biosphere.title}</strong>
+                <p>{biosphere.text}</p>
+              </div>
+            </div>
+          )}
+          <div className="globe-caption">
+            <span className="live-dot" />{' '}
+            {age > 540
+              ? age > 4460
+                ? 'ILLUSTRATION · COOLING EARTH'
+                : age > 4031
+                  ? 'ILLUSTRATION · EARLY OCEANS & CRUST'
+                  : age > 2500
+                    ? 'ILLUSTRATION · ARCHEAN CONTINENTAL CORES'
+                    : age <= 720 && age >= 635
+                      ? `ILLUSTRATION · ${conditions.climate.toUpperCase()}`
+                      : 'ILLUSTRATION · PRECAMBRIAN WORLD'
+              : age > 0.12
+                ? 'PALEOMAP SCIENTIFIC RECONSTRUCTION'
+                : age > 0.012 && layers.ice
+                  ? 'APPROXIMATE GLACIAL GEOGRAPHY'
+                  : 'NASA BLUE MARBLE · MODERN EARTH'}
+            <span className="caption-sub">
+              {status ||
+                (age > 540
+                  ? 'Land positions and surface colors are illustrative'
+                  : 'Drag to rotate · Scroll or pinch to zoom')}
+            </span>
+          </div>
+          <aside className="context">
+            <div className="context-heading">
+              <span className="eyebrow">
+                {started ? 'WORLD AT A GLANCE' : 'YOU ARE EXPLORING'}
+              </span>
+              <button
+                aria-label="About this reconstruction"
+                onClick={() => setDrawer('sources')}
+              >
+                <Info size={14} />
+              </button>
+            </div>
+            {!started && (
+              <>
+                <h2>The world we know</h2>
+                <p>A fleeting moment in a remarkable planetary story.</p>
+              </>
+            )}
+            <div className="planet-facts">
+              <div>
+                <Mountain size={15} />
+                <span>
+                  Continents<strong>{conditions.land}</strong>
+                </span>
+              </div>
+              <div>
+                <Activity size={15} />
+                <span>
+                  {age > 0 && age <= 0.125 && layers.ice
+                    ? 'Sea level · illustrative'
+                    : 'Climate'}
+                  <strong>
+                    {age > 0 && age <= 0.125 && layers.ice
+                      ? `~${Math.round(seaLevel(age) / 5) * 5} m vs. today`
+                      : conditions.climate}
+                  </strong>
+                </span>
+              </div>
+              <div>
+                <Wind size={15} />
+                <span>
+                  Atmosphere<strong>{conditions.air}</strong>
+                </span>
+              </div>
+            </div>
+            <hr />
+            <div className="context-heading">
+              <span className="eyebrow">PLANET LAYERS</span>
+              <button
+                onClick={() => setDrawer('layers')}
+                aria-label="All visualization layers"
+              >
+                <SlidersHorizontal size={14} />
+              </button>
+            </div>
+            {layerDefs
+              .filter((l) => ['plates', 'life', 'ice'].includes(l.key))
+              .map((l) => (
+                <label className="layer-row" key={l.key}>
+                  <l.icon size={15} />
+                  <span>{l.name}</span>
+                  <Switch
+                    size="sm"
+                    checked={layers[l.key]}
+                    onCheckedChange={(v) => toggleLayer(l.key, v)}
+                  />
+                </label>
+              ))}
+            <button className="all-layers" onClick={() => setDrawer('layers')}>
+              All layers <ChevronRight size={14} />
+            </button>
+            {layers.plates && age > 0.3 && (
+              <p className="layer-notice">
+                Modern plate boundaries are hidden in ancient views.
+              </p>
+            )}
+            {layers.migration && (
+              <p className="layer-notice">
+                {age > 0.3
+                  ? 'Migration appears within the last 300,000 years.'
+                  : 'Dashed routes show approximate connections, not exact paths.'}
+              </p>
+            )}
+            {layers.climate && (
+              <p className="layer-notice">
+                Latitude bands are illustrative, not temperature measurements.
+              </p>
+            )}
+          </aside>
+          <div className="view-toolbar" aria-label="Globe controls">
+            <button
+              aria-label="Zoom in"
+              title="Zoom in"
+              onClick={() => api.current?.zoom(0.85)}
+            >
+              <Plus size={18} />
+            </button>
+            <button
+              aria-label="Zoom out"
+              title="Zoom out"
+              onClick={() => api.current?.zoom(1.15)}
+            >
+              <Minus size={18} />
+            </button>
+            <span />
+            <button
+              aria-label="Reset globe view"
+              title="Reset view"
+              onClick={() => api.current?.reset()}
+            >
+              <RotateCcw size={16} />
+            </button>
+            <button
+              aria-label={
+                autoRotate ? 'Stop globe rotation' : 'Start globe rotation'
+              }
+              aria-pressed={autoRotate}
+              title="Auto rotation"
+              className={autoRotate ? 'on' : ''}
+              onClick={() => setAutoRotate((v) => !v)}
+            >
+              <Orbit size={17} />
+            </button>
+            <button
+              aria-label={full ? 'Exit full screen' : 'Full screen'}
+              title="Full screen"
+              onClick={async () => {
+                try {
+                  if (document.fullscreenElement)
+                    await document.exitFullscreen();
+                  else await document.documentElement.requestFullscreen();
+                } catch {
+                  setStatus('Full screen is unavailable in this preview.');
+                }
+              }}
+            >
+              <Maximize2 size={16} />
+            </button>
+          </div>
+          <button
+            className="mobile-layer-toggle"
+            onClick={() => setDrawer('layers')}
+          >
+            <Layers3 size={17} /> Layers
+          </button>
+          <div className="bottom-workspace">
+            <button onClick={() => setCompression(true)}>
+              <Clock3 size={14} />
+              <span>Earth in a day</span>
+            </button>
+            <span className="orientation">
+              N <span>↑</span>
+            </span>
+            <button
+              onClick={() => {
+                setSavedAge(age);
+                setCompare(true);
+              }}
+            >
+              <GitCompareArrows size={14} />
+              <span>Compare worlds</span>
+            </button>
+          </div>
+        </section>
+        <section
+          className="time-panel"
+          id="time-control"
+          data-playing={playing}
+          aria-label="Time travel controls"
+        >
+          <svg
+            className="console-shell"
+            viewBox="0 0 1200 220"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
+            <defs>
+              <linearGradient id="console-glass" x2="0" y2="1">
+                <stop stopColor="#a5b8b8" stopOpacity=".09" />
+                <stop offset=".45" stopColor="#071012" stopOpacity=".78" />
+                <stop offset="1" stopColor="#101716" stopOpacity=".5" />
+              </linearGradient>
+              <linearGradient id="console-rim">
+                <stop stopColor="#667a7d" stopOpacity=".1" />
+                <stop offset=".3" stopColor="#c4d6d8" stopOpacity=".7" />
+                <stop offset=".5" stopColor="#f0dfb9" />
+                <stop offset=".7" stopColor="#c4d6d8" stopOpacity=".7" />
+                <stop offset="1" stopColor="#667a7d" stopOpacity=".1" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M 0 40 Q 245 8 475 19 Q 600 -14 725 19 Q 955 8 1200 40 L 1178 211 Q 600 227 22 211 Z"
+              fill="url(#console-glass)"
+              stroke="#cbd4c02a"
+            />
+            <path
+              d="M 0 40 Q 245 8 475 19 Q 600 -14 725 19 Q 955 8 1200 40"
+              fill="none"
+              stroke="url(#console-rim)"
+              strokeWidth="1.4"
+            />
+            <path
+              d="M 34 213 Q 600 227 1166 213"
+              fill="none"
+              stroke="url(#console-rim)"
+              strokeOpacity=".4"
+            />
+            <path
+              d="M 17 44 Q 245 17 475 25 Q 600 -6 725 25 Q 955 17 1183 44"
+              fill="none"
+              stroke="url(#console-rim)"
+              strokeOpacity=".2"
+            />
+            <path
+              d="M 13 55 L 32 191 M 1187 55 L 1168 191"
+              fill="none"
+              stroke="#b7dce4"
+              strokeOpacity=".18"
+              strokeWidth=".7"
+            />
+          </svg>
+          <div className="time-head">
+            <div className="date-block">
+              <span className="eyebrow">YOUR PLACE IN TIME</span>
+              <strong aria-live={playing ? 'off' : 'polite'}>
+                {formatAge(age)}
+              </strong>
+              <span className="epoch-line">
+                {[time.eon, time.era, time.period, time.epoch]
+                  .filter(Boolean)
+                  .join(' / ')}
+              </span>
+            </div>
+            <div className="timeline-actions">
+              <div className="scale-picker">
+                <span>TIME SCALE</span>
+                <Select
+                  value={String(scale)}
+                  onValueChange={(v) => changeScale(Number(v))}
+                >
+                  <SelectTrigger aria-label="Timeline scale">
+                    <SelectValue>
+                      {scale === 3
+                        ? 'Ice age'
+                        : scale === 4
+                          ? 'Recent Earth'
+                          : scales[scale].name}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {scales.map((s, i) => (
+                      <SelectItem key={s.name} value={String(i)}>
+                        {i === 3
+                          ? 'Ice age'
+                          : i === 4
+                            ? 'Recent Earth'
+                            : s.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="play-controls">
+                <button
+                  className="step-button"
+                  aria-label="Previous milestone"
+                  onClick={() => {
+                    const e = [...events]
+                      .reverse()
+                      .find((e) => e.age > age + 0.0000001);
+                    if (e) jump(e);
+                  }}
+                  disabled={age >= 4540}
+                >
+                  <ChevronLeft size={17} />
+                </button>
+                <button
+                  className="play-button"
+                  onClick={playPause}
+                  aria-label={playing ? 'Pause history' : 'Play Earth history'}
+                >
+                  {playing ? (
+                    <Pause size={17} fill="currentColor" />
+                  ) : (
+                    <Play size={17} fill="currentColor" />
+                  )}
+                </button>
+                <button
+                  className="step-button"
+                  aria-label="Next milestone"
+                  onClick={() => {
+                    const e = events.find((e) => e.age < age - 0.0000001);
+                    if (e) jump(e);
+                  }}
+                  disabled={age === 0}
+                >
+                  <ChevronRight size={17} />
+                </button>
+                <Select value={speed} onValueChange={(v) => v && setSpeed(v)}>
+                  <SelectTrigger
+                    aria-label="Playback speed"
+                    className="speed-select"
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {['Cinematic', 'Normal', 'Fast', 'Very fast'].map((s) => (
+                      <SelectItem key={s} value={s}>
+                        {s}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+          <div className="timeline-track">
+            <div
+              className="event-ticks"
+              aria-label="Milestones on the timeline"
+            >
+              {visibleMarkers.map((e) => (
+                <button
+                  key={e.id}
+                  className={
+                    e.category === 'Extinction' ? 'extinction-tick' : ''
+                  }
+                  style={{ left: `${toPosition(e.age, scale)}%` }}
+                  title={`${e.title} · ${e.date}`}
+                  aria-label={`Jump to ${e.title}`}
+                  onClick={() => jump(e)}
+                >
+                  <span />
+                </button>
+              ))}
+            </div>
+            <Slider
+              aria-label="Time travel position"
+              min={0}
+              max={100}
+              step={0.01}
+              value={[position]}
+              onValueChange={(v) => scrub(Array.isArray(v) ? v[0] : v)}
+            />
+            <div className="timeline-labels">
+              {timeLabels.map((x) => (
+                <span
+                  key={x.p}
+                  style={{
+                    left: `${x.p}%`,
+                    transform:
+                      x.p === 0
+                        ? 'none'
+                        : x.p === 100
+                          ? 'translateX(-100%)'
+                          : 'translateX(-50%)',
+                  }}
+                >
+                  {x.t}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div
+            className="eon-strip"
+            style={{
+              gridTemplateColumns:
+                scale === 0
+                  ? '1fr 2fr 4fr 13fr'
+                  : scale === 1
+                    ? '289fr 186fr 66fr'
+                    : '1fr',
+            }}
+          >
+            {(scale === 0
+              ? [
+                  ['Hadean', 4500],
+                  ['Archean', 3500],
+                  ['Proterozoic', 1500],
+                  ['Phanerozoic', 280],
+                ]
+              : scale === 1
+                ? [
+                    ['Paleozoic', 400],
+                    ['Mesozoic', 150],
+                    ['Cenozoic', 20],
+                  ]
+                : [
+                    [
+                      scale === 3
+                        ? 'Ice age'
+                        : scale === 4
+                          ? 'Recent Earth'
+                          : scales[scale].name,
+                      scales[scale].max / 2,
+                    ],
+                  ]
+            ).map(([name, target]) => (
+              <button
+                key={name}
+                onClick={() => {
+                  setAge(Number(target));
+                  setStarted(true);
+                  setSelected(null);
+                  setPlaying(false);
+                }}
+              >
+                {name}
+              </button>
+            ))}
+          </div>
+          <div className="timeline-foot">
+            <span>
+              {scale === 0
+                ? 'Adaptive scale · Recent history is expanded for exploration'
+                : 'Linear scale within this time window'}{' '}
+              {playing && ' · Playing'}
+            </span>
+            <button onClick={() => setDrawer('eras')}>
+              Jump to a chapter <ChevronRight size={12} />
+            </button>
+          </div>
+        </section>
+      </div>
+      <section className="chapter-shelf" aria-label="Featured chapters">
+        <div className="shelf-title">
+          <span className="eyebrow">WORLDS BEFORE OURS</span>
+          <button onClick={() => setDrawer('eras')}>
+            Explore all <ArrowUpRight size={13} />
+          </button>
+        </div>
+        <div className="chapter-row">
+          {keyChapters.slice(0, 8).map((e, i) => {
+            const Icon = categoryIcon[e.category];
+            return (
+              <button
+                key={e.id}
+                className={`chapter-card chapter-${e.id} ${story.id === e.id ? 'selected' : ''}`}
+                onClick={() => jump(e)}
+              >
+                <div className="chapter-art">
+                  <Icon size={21} />
+                </div>
+                <span>
+                  <small>{formatAge(e.age, true)}</small>
+                  <strong>
+                    {e.id === 'formation'
+                      ? 'Earth is born'
+                      : e.id === 'life'
+                        ? 'First life'
+                        : e.id === 'snowball'
+                          ? 'Snowball Earth'
+                          : e.id === 'cambrian'
+                            ? 'Cambrian life'
+                            : e.id === 'pangaea'
+                              ? 'Pangaea'
+                              : e.id === 'jurassic'
+                                ? 'Age of giants'
+                                : e.id === 'kpg'
+                                  ? 'The last dinosaurs'
+                                  : 'Homo sapiens'}
+                  </strong>
+                </span>
+                <ChevronRight size={12} />
+              </button>
+            );
+          })}
+        </div>
+      </section>
+      <footer className="atlas-footer">
+        <span>ONE PLANET. AN EXTRAORDINARY STORY.</span>
+        <button onClick={() => setDrawer('sources')}>
+          <BookOpen size={12} /> Science, sources & uncertainty
+        </button>
+      </footer>
+      <Sheet open={drawer !== null} onOpenChange={(v) => !v && setDrawer(null)}>
+        <SheetContent
+          scrollResetKey={`${drawer}:${story.id}`}
+          className="atlas-sheet"
+          side="right"
+        >
+          <SheetHeader>
+            <SheetTitle>
+              {drawer === 'eras'
+                ? 'Explore the ages'
+                : drawer === 'layers'
+                  ? 'A different view of Earth'
+                  : drawer === 'sources'
+                    ? 'An atlas grounded in evidence'
+                    : story.title}
+            </SheetTitle>
+            <SheetDescription>
+              {drawer === 'eras'
+                ? 'Every chapter opens another world.'
+                : drawer === 'layers'
+                  ? 'Choose what the planet reveals.'
+                  : drawer === 'sources'
+                    ? 'Scientific reconstructions, honest uncertainties.'
+                    : story.date}
+            </SheetDescription>
+          </SheetHeader>
+          <div className="sheet-body">
+            {drawer === 'eras' && (
+              <>
+                <div className="category-filters">
+                  {[
+                    'All chapters',
+                    'Planet',
+                    'Life',
+                    'Climate',
+                    'Extinction',
+                  ].map((c) => (
+                    <button
+                      key={c}
+                      className={category === c ? 'active' : ''}
+                      onClick={() => setCategory(c)}
+                    >
+                      {c}
+                    </button>
+                  ))}
+                </div>
+                <div className="era-list">
+                  {filteredEvents.map((e) => {
+                    const Icon = categoryIcon[e.category];
+                    return (
+                      <button key={e.id} onClick={() => jump(e)}>
+                        <Icon size={19} />
+                        <span>
+                          <small>{e.date}</small>
+                          <strong>{e.title}</strong>
+                        </span>
+                        <ChevronRight size={16} />
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+            {drawer === 'layers' && (
+              <div className="layer-catalog">
+                {layerDefs.map((l) => (
+                  <div key={l.key}>
+                    <label>
+                      <l.icon size={18} />
+                      <strong>{l.name}</strong>
+                      <Switch
+                        checked={layers[l.key]}
+                        onCheckedChange={(v) => toggleLayer(l.key, v)}
+                      />
+                    </label>
+                    <p>{l.help}</p>
+                    {l.key === 'plates' && layers.plates && age > 0.3 && (
+                      <button
+                        className="text-link"
+                        onClick={() =>
+                          jump(events.find((e) => e.id === 'present')!)
+                        }
+                      >
+                        View modern boundaries <ArrowUpRight size={14} />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+            {drawer === 'details' && (
+              <>
+                <div className="detail-badges">
+                  <span>{story.category}</span>
+                  <span>
+                    {chapterChronology(story).period ||
+                      chapterChronology(story).era ||
+                      chapterChronology(story).eon}
+                  </span>
+                </div>
+                <h3>What happened</h3>
+                <p>{story.description}</p>
+                <h3>Why it matters</h3>
+                <p>{story.importance}</p>
+                <h3>Where it happened</h3>
+                <p>{story.place}</p>
+                <div className="evidence-box">
+                  <Info size={18} />
+                  <div>
+                    <h3>Evidence & scientific certainty</h3>
+                    <p>{story.certainty}</p>
+                  </div>
+                </div>
+                {story.category === 'Migration' && (
+                  <>
+                    <h3>Routes are not a single story</h3>
+                    <p>
+                      Dashed connections represent broad population movements.
+                      Populations branched, moved repeatedly and exchanged
+                      ancestry. Dates do not establish one definite path.
+                    </p>
+                  </>
+                )}
+                {story.id === 'ice-age' && (
+                  <>
+                    <h3>A coastline changes the journey</h3>
+                    <p>
+                      Sunda and Sahul expose wider land areas, while deep
+                      channels through Wallacea remain. Ice sheets can make a
+                      land connection inaccessible. Our 1° elevation grid cannot
+                      resolve every strait or coastal corridor.
+                    </p>
+                  </>
+                )}
+                <h3>Sources</h3>
+                <SourceLinks ids={story.sources} />
+                <h3>Continue exploring</h3>
+                <div className="related">
+                  {events
+                    .filter((e) => e.id !== story.id)
+                    .sort(
+                      (a, b) =>
+                        Math.abs(
+                          toPosition(a.age, 0) - toPosition(story.age, 0),
+                        ) -
+                        Math.abs(
+                          toPosition(b.age, 0) - toPosition(story.age, 0),
+                        ),
+                    )
+                    .slice(0, 3)
+                    .map((e) => (
+                      <button key={e.id} onClick={() => jump(e, true)}>
+                        {e.title}
+                        <ChevronRight size={14} />
+                      </button>
+                    ))}
+                </div>
+              </>
+            )}
+            {drawer === 'sources' && (
+              <>
+                <p>
+                  AEON is an exploratory atlas of Earth’s history. The planet
+                  changes using scientific data where it is available, with
+                  explicit distinctions between observations, reconstructions
+                  and illustrations.
+                </p>
+                <h3>Modern Earth</h3>
+                <p>
+                  NASA Blue Marble Next Generation, July 2004. A cloud-free
+                  satellite composite, not a live view. Clouds, atmosphere and
+                  lighting are illustrative.
+                </p>
+                <h3>540 million years of changing geography</h3>
+                <p>
+                  109 elevation grids from Scotese & Wright (2018), generally at
+                  5-million-year intervals and 1° spatial resolution. Land,
+                  shallow seas and ocean depths derive from these grids.
+                  Interpolation blends reconstructed elevations; it is not a
+                  continuous plate-motion solution. Colors are a terrain
+                  treatment, not evidence of actual vegetation.
+                </p>
+                <h3>Before 540 million years ago</h3>
+                <p>
+                  Procedural worlds distinguish cooling crust, early oceans,
+                  growing continental cores and later Precambrian worlds.
+                  Coastlines, exposed land fractions, surface colors and cloud
+                  cover are qualitative illustrations, not measured
+                  reconstructions. Zircon evidence supports liquid water by
+                  about 4.4 billion years ago; the timing and extent of early
+                  oceans remain uncertain. The cooling transition is schematic.
+                  Cryogenian ice is shown in two approximate episodes (717–659
+                  and about 645–635 million years ago), separated by a
+                  nonglacial interval. The Marinoan onset is uncertain; ice
+                  extent and visual transitions are schematic. Proposed
+                  Vaalbara, Kenorland, Nuna, Rodinia and Pannotia configurations
+                  are discussed as hypotheses, not drawn as settled fact.
+                </p>
+                <h3>Ice ages and human migrations</h3>
+                <p>
+                  Shelf exposure uses a coarse modern elevation grid with an
+                  illustrative interpolation between published anchors: about
+                  −120 m at 21,000 years, −75 m at 50,000 years and −85 m at
+                  65,000 years ago. Ice regions are schematic. Routes show broad
+                  dispersal connections, not a measured sequence; coastal
+                  detail, ice barriers and competing hypotheses require
+                  specialist regional maps.
+                </p>
+                <h3>Dates and uncertainty</h3>
+                <p>
+                  Dates are approximate, expressed in years before present for
+                  navigation. The geological hierarchy follows the ICS 2024/12
+                  chart, including the 4031 Ma Archean boundary; boundaries can
+                  be revised. BCE dates are rounded for ancient civilizations.
+                  Climate descriptions are qualitative: no unsupported
+                  temperature, oxygen or CO₂ series is implied.
+                </p>
+                <h3>Data credits</h3>
+                <p>
+                  PALEOMAP PaleoDEMs: Scotese, C.R. & Wright, N. (2018), CC BY
+                  4.0. Elevation encoding, rendering and interpolation adapted.
+                  Modern plate boundaries: Peter Bird (2003), converted by Hugo
+                  Ahlenius, ODC Attribution License. NASA imagery is
+                  acknowledged without implying endorsement.
+                </p>
+                <SourceLinks
+                  ids={[
+                    'cryogenian',
+                    'earlyClimate',
+                    'earlyWater',
+                    'paleo',
+                    'nasa',
+                    'plates',
+                    'ics',
+                    'human',
+                    'migration',
+                    'sahul',
+                    'sea',
+                    'usgs',
+                    'life',
+                    'oxygen',
+                    'snow',
+                    'kpg',
+                    'agriculture',
+                  ]}
+                />
+                <h3>Controls & accessibility</h3>
+                <p>
+                  Drag the globe to rotate; pinch or scroll to zoom. Focus the
+                  globe and use arrow keys to rotate. The timeline supports
+                  arrow keys, Home and End. Space plays or pauses when the page
+                  body is focused. Ctrl/⌘ K opens search. Reduced-motion
+                  preferences disable automatic globe rotation and ease effects.
+                </p>
+              </>
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
+      <Dialog open={search} onOpenChange={setSearch}>
+        <DialogContent className="search-dialog">
+          <DialogHeader>
+            <DialogTitle>Find a moment in Earth’s history</DialogTitle>
+            <DialogDescription>
+              Search an event, period, organism or place.
+            </DialogDescription>
+          </DialogHeader>
+          <Command
+            filter={(value, search) =>
+              search
+                .toLowerCase()
+                .trim()
+                .split(/\s+/)
+                .every((word) => value.toLowerCase().includes(word))
+                ? 1
+                : 0
+            }
+          >
+            <CommandInput
+              value={query}
+              onValueChange={setQuery}
+              placeholder="Try Pangaea, dinosaurs, or ice ages…"
+              aria-label="Search historical events"
+            />
+            <CommandList>
+              <CommandEmpty>
+                No matching chapters. Try “life”, “ice” or “Pangaea”.
+              </CommandEmpty>
+              <CommandGroup
+                heading={query ? 'Matching chapters' : 'Explore a chapter'}
+              >
+                {events.map((e) => {
+                  const Icon = categoryIcon[e.category];
+                  return (
+                    <CommandItem
+                      key={e.id}
+                      value={`${e.id} ${e.place} ${e.title} ${e.keywords || ''} ${e.category} ${e.description}`}
+                      onSelect={() => jump(e, true)}
+                    >
+                      <Icon size={17} />
+                      <span>
+                        {e.title}
+                        <small>{formatAge(e.age, true)}</small>
+                      </span>
+                      <ArrowUpRight size={14} />
+                    </CommandItem>
+                  );
+                })}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={compression} onOpenChange={setCompression}>
+        <DialogContent className="compression-dialog">
+          <DialogHeader>
+            <DialogTitle>All of Earth. One fleeting moment.</DialogTitle>
+            <DialogDescription>
+              If Earth’s 4.54-billion-year history fit into{' '}
+              {compressUnit === '24 hours'
+                ? 'a single day'
+                : 'one calendar year'}
+              , when would its turning points occur?
+            </DialogDescription>
+          </DialogHeader>
+          <div className="category-filters">
+            {['24 hours', 'One year'].map((u) => (
+              <button
+                className={compressUnit === u ? 'active' : ''}
+                key={u}
+                onClick={() => setCompressUnit(u)}
+              >
+                {u}
+              </button>
+            ))}
+          </div>
+          <div className="cosmic-clock">
+            <Clock3 size={40} />
+            <strong>
+              {compressUnit === '24 hours' ? '23:39:03' : 'December 26'}
+            </strong>
+            <span>
+              {compressUnit === '24 hours'
+                ? 'The end-Cretaceous extinction falls in the final ~21 minutes.'
+                : 'The end-Cretaceous extinction falls within the final six days.'}
+            </span>
+          </div>
+          <div className="compression-events">
+            {['life', 'oxygen', 'cambrian', 'dinosaurs', 'kpg', 'ice-age'].map(
+              (id) => {
+                const e = events.find((e) => e.id === id)!;
+                const fraction = 1 - e.age / 4540;
+                const seconds = Math.floor(fraction * 86400);
+                const clock = `${Math.floor(seconds / 3600)
+                  .toString()
+                  .padStart(2, '0')}:${Math.floor((seconds % 3600) / 60)
+                  .toString()
+                  .padStart(
+                    2,
+                    '0',
+                  )}:${(seconds % 60).toString().padStart(2, '0')}`;
+                const date = new Date(
+                  Date.UTC(2025, 0, 1) + fraction * 365 * 86400000,
+                );
+                return (
+                  <button
+                    key={id}
+                    onClick={() => {
+                      setCompression(false);
+                      jump(e);
+                    }}
+                  >
+                    <span>{e.title}</span>
+                    <strong>
+                      {compressUnit === '24 hours'
+                        ? clock
+                        : date.toLocaleDateString('en', {
+                            month: 'short',
+                            day: 'numeric',
+                            timeZone: 'UTC',
+                          })}
+                    </strong>
+                  </button>
+                );
+              },
+            )}
+          </div>
+          <p className="fine-print">
+            An illustrative compression using approximate event ages. A year is
+            treated as 365 days; this is a scale analogy, not a historical
+            calendar.
+          </p>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={compare} onOpenChange={setCompare}>
+        <DialogContent className="compare-dialog">
+          <DialogHeader>
+            <DialogTitle>Two moments. One changing planet.</DialogTitle>
+            <DialogDescription>
+              Pin one world, then compare its geography and environment with
+              another chapter.
+            </DialogDescription>
+          </DialogHeader>
+          <Select
+            value={String(savedAge ?? 0)}
+            onValueChange={(v) => setSavedAge(Number(v))}
+          >
+            <SelectTrigger aria-label="Comparison world">
+              <SelectValue>{formatAge(savedAge ?? 0)}</SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {keyChapters.map((e) => (
+                <SelectItem key={e.id} value={String(e.age)}>
+                  {e.title} · {formatAge(e.age, true)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <div className="compare-planets">
+            {[savedAge ?? 0, age === savedAge ? 280 : age].map((a, i) => (
+              <div key={i}>
+                <div className="mini-globe">
+                  <Globe
+                    age={a}
+                    layers={{ ...defaults, clouds: false }}
+                    selected={null}
+                    onSelect={() => {}}
+                    onReady={() => {}}
+                    autoRotate={false}
+                    onStatus={() => {}}
+                  />
+                </div>
+                <strong>{formatAge(a)}</strong>
+                <span>{environment(a).land}</span>
+                <p>{environment(a).climate}</p>
+                <button
+                  className="text-link"
+                  onClick={() => {
+                    setCompare(false);
+                    setStarted(true);
+                    setPlaying(false);
+                    setSelected(null);
+                    setScale(a <= 540 ? 1 : 0);
+                    setAge(a);
+                  }}
+                >
+                  Explore this world <ArrowUpRight size={13} />
+                </button>
+              </div>
+            ))}
+          </div>
+          <p className="fine-print">
+            Before 540 million years ago, landforms are illustrative. Later
+            ancient geography uses PALEOMAP reconstructions; modern imagery is
+            observed. Terrain colors are not directly comparable vegetation
+            measurements.
+          </p>
+        </DialogContent>
+      </Dialog>
+    </main>
+  );
 }
-function SourceLinks({ids}:{ids:string[]}){return <ul className="sources-list">{ids.map(id=>sources[id]&&<li key={id}><a href={sources[id].url} target="_blank" rel="noreferrer">{sources[id].name}<ExternalLink size={13}/></a></li>)}</ul>}
-
-
-
-
-
-
-
-
-
-
-
+function SourceLinks({ ids }: { ids: string[] }) {
+  return (
+    <ul className="sources-list">
+      {ids.map(
+        (id) =>
+          sources[id] && (
+            <li key={id}>
+              <a href={sources[id].url} target="_blank" rel="noreferrer">
+                {sources[id].name}
+                <ExternalLink size={13} />
+              </a>
+            </li>
+          ),
+      )}
+    </ul>
+  );
+}
