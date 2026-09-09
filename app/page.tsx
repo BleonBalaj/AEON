@@ -1251,6 +1251,18 @@ export default function Home() {
                   Vaalbara, Kenorland, Nuna, Rodinia and Pannotia configurations
                   are discussed as hypotheses, not drawn as settled fact.
                 </p>
+                <h3>Deep-time surface colors</h3>
+                <p>
+                  PaleoDEM constrains land, ocean and elevation from 540 million
+                  years ago onward. Surface colors add broad, evidence-guided
+                  climate character rather than mapped vegetation: mostly bare
+                  land before terrestrial plants, regional Carboniferous
+                  tropical wetlands, increasingly dry Permian and Triassic
+                  interiors, and broader humid belts in later greenhouse worlds.
+                  The late Paleozoic southern ice overlay is schematic and can be
+                  hidden with the ice layer; it is not a time-resolved ice-margin
+                  reconstruction.
+                </p>
                 <h3>Ice ages and human migrations</h3>
                 <p>
                   Shelf exposure uses a coarse modern elevation grid with an
@@ -1294,6 +1306,9 @@ export default function Home() {
                     'usgs',
                     'life',
                     'oxygen',
+                    'latePaleoClimate',
+                    'pangaeaAridity',
+                    'triassicClimate',
                     'snow',
                     'kpg',
                     'agriculture',
