@@ -3,7 +3,7 @@ import {useEffect,useRef,useState} from 'react';
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {routes,hominins} from '@/lib/earth/migration';
-import {events,EarthEvent,seaLevel,cryogenianIce,latePaleozoicIce} from '@/lib/earth/history';
+import {events,EarthEvent,seaLevel,cryogenianIce,latePaleozoicIce,latePleistoceneIce} from '@/lib/earth/history';
 export type Layers={clouds:boolean;plates:boolean;climate:boolean;ice:boolean;life:boolean;humans:boolean;migration:boolean;civilization:boolean;grid:boolean};
 export type GlobeApi={zoom:(factor:number)=>void;reset:()=>void;focus:(lat:number,lon:number)=>void};
 type Props={age:number;layers:Layers;selected:EarthEvent|null;onSelect:(e:EarthEvent)=>void;onReady:(api:GlobeApi)=>void;autoRotate:boolean;onStatus:(s:string)=>void;onBuffering?:(waiting:boolean)=>void;routeIds?:string[]};
@@ -11,12 +11,17 @@ const vertex=`varying vec2 vUv;varying vec3 vN;varying vec3 vP;varying vec3 vV;v
 const fragment=`
 precision highp float;
 uniform sampler2D earth;uniform sampler2D mapA;uniform sampler2D mapB;
-uniform float blend;uniform float age;uniform float modern;uniform float clouds;uniform float climate;uniform float ice;uniform float grid;uniform float tick;uniform float seaLevel;uniform float ancientIce;uniform float latePaleoIce;
+uniform float blend;uniform float age;uniform float modern;uniform float clouds;uniform float climate;uniform float ice;uniform float grid;uniform float tick;uniform float seaLevel;uniform float ancientIce;uniform float latePaleoIce;uniform float pleistoceneIce;
 varying vec2 vUv;varying vec3 vN;varying vec3 vP;varying vec3 vV;
 float hash(vec3 p){p=fract(p*.3183099+vec3(.1,.2,.3));p*=17.;return fract(p.x*p.y*p.z*(p.x+p.y+p.z));}
 float noise(vec3 x){vec3 i=floor(x),f=fract(x);f=f*f*(3.-2.*f);return mix(mix(mix(hash(i),hash(i+vec3(1,0,0)),f.x),mix(hash(i+vec3(0,1,0)),hash(i+vec3(1,1,0)),f.x),f.y),mix(mix(hash(i+vec3(0,0,1)),hash(i+vec3(1,0,1)),f.x),mix(hash(i+vec3(0,1,1)),hash(i+vec3(1,1,1)),f.x),f.y),f.z);}
 float fbm(vec3 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*noise(p);p=p*2.07+4.3;a*=.5;}return v;}
 float heightAt(sampler2D tex,vec2 uv){vec2 c=texture2D(tex,uv).rg*255.;return c.x*256.+c.y-10000.;}
+float geoMask(vec3 point,float latDeg,float lonDeg,float radiusDeg){
+ float la=radians(latDeg),lo=radians(lonDeg),r=radians(radiusDeg);
+ vec3 center=vec3(cos(la)*cos(lo),sin(la),-cos(la)*sin(lo));
+ return smoothstep(cos(r),cos(r*.70),dot(point,center));
+}
 void main(){
  vec3 n=normalize(vN);vec3 p=normalize(vP);float lat=abs(p.y);float h=mix(heightAt(mapA,vUv),heightAt(mapB,vUv),blend);
  // Precambrian terrain is a qualitative illustration, not reconstructed coastlines.
@@ -47,11 +52,20 @@ void main(){
  if(early>.5)low=mix(vec3(.21,.19,.16),vec3(.08,.075,.07),youngCrust);
  vec3 ground=mix(low,vec3(.42,.40,.34),smoothstep(500.,5000.,h));ground*=.78+rough*.45;
  vec3 base=mix(ocean,ground,land);
+ // Bathymetry becomes land as global sea level falls. A subdued mineral tint
+ // makes Beringia, Sunda and Sahul legible without implying exact vegetation.
+ float exposedShelf=glacial*land*(1.-smoothstep(-12.,18.,h))*smoothstep(sea-30.,sea+35.,h);
+ base=mix(base,mix(vec3(.34,.31,.225),vec3(.22,.285,.235),equator*.35),exposedShelf*.72);
  vec3 sat=pow(texture2D(earth,vUv).rgb,vec3(2.2));base=mix(base,sat,modern*(1.-glacial));
  float cap=smoothstep(.91,.98,lat)*step(age,34.);float paleoIce=ancientIce;cap=max(cap,paleoIce*smoothstep(.02,.28,lat));
  float gondwanaIce=latePaleoIce*smoothstep(.43,.82,-p.y)*land;cap=max(cap,gondwanaIce);
- float lgmNA=exp(-pow((vUv.x-.22)/.12,2.))*smoothstep(.68,.88,p.y);float lgmEU=exp(-pow((vUv.x-.55)/.075,2.))*smoothstep(.73,.86,p.y);
- cap=max(cap,glacial*land*min(1.,lgmNA+lgmEU)*clamp(-sea/120.,0.,1.));base=mix(base,vec3(.66,.78,.83)*(rough*.16+.88),cap);
+ // Simplified geographic footprints, guided by PaleoMIST rather than the
+ // former screen-space blobs. Margins remain illustrative at this resolution.
+ float northAmerica=max(max(geoMask(p,58.,-92.,24.),geoMask(p,54.,-125.,14.)),geoMask(p,74.,-86.,14.));
+ float eurasia=max(max(geoMask(p,64.,24.,21.),geoMask(p,76.,43.,16.)),geoMask(p,55.,-4.,8.));
+ float patagonia=geoMask(p,-50.,-73.,9.);float antarcticShelf=smoothstep(.69,.82,-p.y);
+ float lgmFootprint=max(max(northAmerica,eurasia),max(patagonia,antarcticShelf));
+ cap=max(cap,pleistoceneIce*land*lgmFootprint);base=mix(base,vec3(.66,.78,.83)*(rough*.16+.88),cap);
  float molten=smoothstep(4460.,4520.,age);float lava=pow(max(0.,1.-abs(terrain-.51)*25.),3.);vec3 magma=vec3(.038,.016,.011)+lava*vec3(1.6,.30,.015);base=mix(base,magma,molten);
  float cloudN=fbm(p*8.+vec3(tick*.001+early*age*.0003,0,early*1.7));float cloudShape=smoothstep(.53,.69,cloudN)*clouds*(1.-molten)*.40;cloudShape*=.4+.6*abs(sin(p.y*9.+cloudN*7.));
  float steam=smoothstep(4350.,4460.,age)*(1.-molten);cloudShape=mix(cloudShape,clouds*(.22+.50*smoothstep(.32,.64,cloudN)),steam);base=mix(base,mix(vec3(.78,.84,.87),vec3(.58,.55,.50),steam*.7),cloudShape);
@@ -74,7 +88,7 @@ export default function Globe(props:Props){
  renderer.setPixelRatio(Math.min(devicePixelRatio,innerWidth<700?1.5:2));renderer.setClearColor(0,0);el.appendChild(renderer.domElement);renderer.domElement.setAttribute('aria-label','Interactive Earth. Drag to rotate, pinch or scroll to zoom. Use arrow keys to rotate.');renderer.domElement.tabIndex=0;
  const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(34,1,.1,100);camera.position.set(3.7,1.2,-1.65);const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=!reduced;controls.dampingFactor=.07;controls.enablePan=false;controls.minDistance=1.55;controls.maxDistance=6.5;controls.rotateSpeed=.55;controls.zoomSpeed=.7;controls.autoRotateSpeed=.24;
  const fallback=new THREE.DataTexture(new Uint8Array([39,16,0]),1,1,THREE.RGBFormat);fallback.needsUpdate=true;
- const uniforms={earth:{value:fallback as THREE.Texture},mapA:{value:fallback as THREE.Texture},mapB:{value:fallback as THREE.Texture},blend:{value:0},age:{value:0},modern:{value:0},clouds:{value:1},climate:{value:0},ice:{value:1},grid:{value:0},tick:{value:0},seaLevel:{value:0},ancientIce:{value:0},latePaleoIce:{value:0}};
+ const uniforms={earth:{value:fallback as THREE.Texture},mapA:{value:fallback as THREE.Texture},mapB:{value:fallback as THREE.Texture},blend:{value:0},age:{value:0},modern:{value:0},clouds:{value:1},climate:{value:0},ice:{value:1},grid:{value:0},tick:{value:0},seaLevel:{value:0},ancientIce:{value:0},latePaleoIce:{value:0},pleistoceneIce:{value:0}};
  const material=new THREE.ShaderMaterial({uniforms,vertexShader:vertex,fragmentShader:fragment});
  const planet=new THREE.Mesh(new THREE.SphereGeometry(1,128,80),material);scene.add(planet);
  const airMat=new THREE.ShaderMaterial({vertexShader:vertex,fragmentShader:`varying vec3 vN;varying vec3 vV;void main(){float a=pow(max(0.,1.-abs(dot(normalize(vN),normalize(vV)))),4.);gl_FragColor=vec4(.18,.46,.67,a*.19);}`,side:THREE.BackSide,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending});
@@ -114,7 +128,7 @@ export default function Globe(props:Props){
  // Swap complete surfaces atomically; loading must never turn a visible Earth off.
  const age=renderedAge??requestedAge;
  planet.visible=renderedAge!==null;
- uniforms.age.value=age;uniforms.ancientIce.value=cryogenianIce(age);uniforms.latePaleoIce.value=latePaleozoicIce(age)*+layers.ice;uniforms.seaLevel.value=seaLevel(age);uniforms.clouds.value=+layers.clouds;uniforms.climate.value=+layers.climate;uniforms.ice.value=+layers.ice;uniforms.grid.value=+layers.grid;uniforms.tick.value=reduced?0:now/1000;
+ uniforms.age.value=age;uniforms.ancientIce.value=cryogenianIce(age);uniforms.latePaleoIce.value=latePaleozoicIce(age)*+layers.ice;uniforms.pleistoceneIce.value=latePleistoceneIce(age)*+layers.ice;uniforms.seaLevel.value=seaLevel(age);uniforms.clouds.value=+layers.clouds;uniforms.climate.value=+layers.climate;uniforms.ice.value=+layers.ice;uniforms.grid.value=+layers.grid;uniforms.tick.value=reduced?0:now/1000;
  air.visible=planet.visible&&age<4400&&layers.clouds;
  uniforms.modern.value=age<=.12&&earthLoaded?1:0;
  plates.visible=layers.plates&&age<=.3;if(plateFail&&plates.visible)current.current.onStatus('Plate boundaries could not load.');

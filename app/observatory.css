@@ -207,6 +207,8 @@
 
 /* Keep oversized globe hit targets behind surrounding controls. */
 .odyssey .odyssey-heading,.odyssey .odyssey-console,.odyssey .odyssey-settings{position:relative;z-index:5}
+.paleogeography-readout{display:grid;grid-template-columns:minmax(105px,.7fr) 1.3fr;gap:16px;margin:18px 0;padding:13px 0;border-top:1px solid #d8caa52b;border-bottom:1px solid #d8caa51f;background:linear-gradient(90deg,#b8d6d508,transparent)}.paleogeography-readout>div{min-width:0}.paleogeography-readout>div+div{padding-left:15px;border-left:1px solid #d8caa526}.paleogeography-readout span{display:block;color:#86abb2;font-size:8px;letter-spacing:.2em}.paleogeography-readout strong{display:block;margin:5px 0 1px;color:#e5ddc7;font-size:19px;font-weight:420}.paleogeography-readout small{color:#859891;font-size:9px}.paleogeography-readout ul{display:flex;flex-wrap:wrap;gap:5px 12px;margin:7px 0 0;padding:0;list-style:none}.paleogeography-readout li{color:#b9c9be;font-size:10px;line-height:1.35}.paleogeography-readout li:before{content:'◇';margin-right:5px;color:#cdbb8b;font-size:7px}
+@media(max-width:640px){.paleogeography-readout{grid-template-columns:95px 1fr;gap:10px}.paleogeography-readout>div+div{padding-left:10px}}
 /* The maker's mark is etched into a structural facet, not a control housing. */
 .atlas .topbar .brand{position:relative;isolation:isolate;flex-shrink:0;gap:12px;padding:7px 5px;text-decoration:none}
 .atlas .topbar .brand:before{content:'';position:absolute;z-index:-1;inset:-10px -19px -8px -20px;pointer-events:none;clip-path:polygon(12% 0,94% 0,100% 74%,81% 100%,0 89%,3% 24%);background:linear-gradient(156deg,transparent 9%,#e3ddc512 10%,#02060845 11%,#afbab509 39%,transparent 40%),linear-gradient(12deg,#0008,transparent 62%);opacity:.85}

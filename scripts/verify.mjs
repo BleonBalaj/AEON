@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import ts from 'typescript';
 import sharp from 'sharp';
 const js=ts.transpileModule(fs.readFileSync('lib/earth/history.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText;
-const {events,sources,chronology,chapterChronology,scales,toPosition,fromPosition,seaLevel,cryogenianIce,latePaleozoicIce,environment,lifeAt}=await import('data:text/javascript;base64,'+Buffer.from(js).toString('base64'));
+const {events,sources,chronology,chapterChronology,scales,toPosition,fromPosition,seaLevel,cryogenianIce,latePaleozoicIce,latePleistoceneIce,iceAgeGeography,environment,lifeAt}=await import('data:text/javascript;base64,'+Buffer.from(js).toString('base64'));
 for(let scale=0;scale<scales.length;scale++){
  for(let p=0;p<=100;p+=.125){const age=fromPosition(p,scale);assert(age>=0&&age<=scales[scale].max);assert(Math.abs(toPosition(age,scale)-p)<1e-8,`Timeline round trip ${scale}:${p}`);}
  assert.equal(fromPosition(0,scale),scales[scale].max);assert.equal(fromPosition(100,scale),0);
@@ -14,6 +14,10 @@ assert.equal(chronology(66).era,'Cenozoic');assert.equal(chronology(66).period,'
 assert.equal(chronology(150).period,'Jurassic');assert.equal(chronology(280).period,'Permian');
 assert.equal(chronology(538.8).eon,'Phanerozoic');assert.equal(chronology(539).eon,'Proterozoic');assert.equal(chronology(4031).eon,'Archean');assert.equal(chronology(4032).eon,'Hadean');
 assert.equal(seaLevel(.021),-120);assert.equal(seaLevel(.05),-75);assert.equal(seaLevel(.065),-85);assert.equal(seaLevel(0),0);
+assert.equal(latePleistoceneIce(0),0);assert.equal(latePleistoceneIce(.0117),0);assert.equal(latePleistoceneIce(.021),1);assert.equal(latePleistoceneIce(.08),0);
+assert(latePleistoceneIce(.038)>.45&&latePleistoceneIce(.038)<.65,'38 ka ice must remain below its LGM peak');
+assert.deepEqual(iceAgeGeography(.021).regions,['Beringia exposed','Sunda Shelf exposed','Sahul joined','Wallacea remains maritime']);
+assert.equal(iceAgeGeography(.021).level,-120);assert.deepEqual(iceAgeGeography(0).regions,[]);
 assert.equal(new Set(events.map(e=>e.id)).size,events.length);
 assert.equal(events.filter(e=>e.category==='Extinction').length,5);
 for(const e of events){assert(e.age>=0&&e.age<=4540);assert(e.sources.length>0);for(const s of e.sources)assert(sources[s],`${e.id}: ${s}`);if(e.location){assert(Math.abs(e.location[0])<=90);assert(Math.abs(e.location[1])<=180);}}
