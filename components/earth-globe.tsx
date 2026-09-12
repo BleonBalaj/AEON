@@ -25,10 +25,10 @@ float geoMask(vec3 point,float latDeg,float lonDeg,float radiusDeg){
 void main(){
  vec3 n=normalize(vN);vec3 p=normalize(vP);float lat=abs(p.y);float h=mix(heightAt(mapA,vUv),heightAt(mapB,vUv),blend);
  // Precambrian terrain is a qualitative illustration, not reconstructed coastlines.
- float early=step(540.0001,age);float rough=fbm(p*55.);float terrain=fbm(p*3.8);
+ float early=smoothstep(540.,620.,age);float rough=fbm(p*55.);float terrain=fbm(p*3.8);
  float maturity=1.-smoothstep(2500.,4100.,age);float youngCrust=smoothstep(3800.,4450.,age);
  float drift=age*.00085;vec3 ancientP=vec3(cos(drift)*p.x-sin(drift)*p.z,p.y,sin(drift)*p.x+cos(drift)*p.z);
- if(early>.5){float islands=fbm(ancientP*6.2+vec3(4.1,1.7,age*.0005));float cores=fbm(ancientP*2.8+vec3(age*.00045,2.4,5.3));terrain=mix(islands,cores,maturity);h=(terrain-mix(.635,.51,maturity))*14000.;}
+ if(age>540.){float islands=fbm(ancientP*6.2+vec3(4.1,1.7,age*.0005));float cores=fbm(ancientP*2.8+vec3(age*.00045,2.4,5.3));terrain=mix(islands,cores,maturity);h=mix(h,(terrain-mix(.635,.51,maturity))*14000.,early);}
  float glacial=ice*step(.0001,age)*(1.-step(.125,age));float sea=seaLevel*glacial;
  float land=smoothstep(sea-35.,sea+65.,h);float shelf=smoothstep(-1600.,-50.,h);
  vec3 ocean=mix(vec3(.017,.055,.10),vec3(.038,.19,.22),shelf*.8);ocean+=rough*.014;
@@ -53,7 +53,7 @@ void main(){
  low=mix(low,vec3(.09,.225,.135),coalWet*moisture*.55);
  low=mix(low,dryland,pangaeaDry*(.24+.26*subtropics));
  if(age>470.)low=mineral;
- if(early>.5)low=mix(vec3(.21,.19,.16),vec3(.08,.075,.07),youngCrust);
+ low=mix(low,mix(vec3(.21,.19,.16),vec3(.08,.075,.07),youngCrust),early);
  vec3 ground=mix(low,vec3(.42,.40,.34),smoothstep(500.,5000.,h));ground*=.78+rough*.45;
  vec3 base=mix(ocean,ground,land);
  // Bathymetry becomes land as global sea level falls. A subdued mineral tint
@@ -103,7 +103,7 @@ export default function Globe(props:Props){
  const starGeometry=new THREE.BufferGeometry();starGeometry.setAttribute('position',new THREE.BufferAttribute(starArray,3));const stars=new THREE.Points(starGeometry,new THREE.PointsMaterial({color:'#93b3bf',size:.014,transparent:true,opacity:.48}));scene.add(stars);
  const texCache=new Map<number,THREE.Texture>(),pending=new Set<number>(),failed=new Set<number>();const loader=new THREE.TextureLoader();let renderedAge:number|null=null;let requestKey='';let earthLoaded=false;let lastLoading=false;
  function loadGrid(age:number){if(texCache.has(age)||pending.has(age)||failed.has(age))return;pending.add(age);loader.load(`/paleo/${age}.png`,tex=>{pending.delete(age);if(!alive){tex.dispose();return;}tex.minFilter=THREE.LinearFilter;tex.magFilter=THREE.LinearFilter;tex.generateMipmaps=false;texCache.set(age,tex);if(texCache.size>18){for(const [key,t]of texCache){if(key!==0&&key!==age&&t!==uniforms.mapA.value&&t!==uniforms.mapB.value){t.dispose();texCache.delete(key);break;}}}},undefined,()=>{pending.delete(age);failed.add(age);if(alive&&requestKey.split(':').map(Number).includes(age)){current.current.onStatus('Reconstruction unavailable — holding the last loaded world.');setError('This scientific reconstruction could not load. Choose another chapter or reload the globe.');}});}
- loader.load('/textures/earth.webp',tex=>{if(!alive){tex.dispose();return;}tex.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());uniforms.earth.value=tex;earthLoaded=true;setLoaded(true);},undefined,()=>{if(alive){setLoaded(true);current.current.onStatus('NASA imagery unavailable; showing elevation-derived Earth.');}});loadGrid(0);
+ loader.load('/textures/earth.webp',tex=>{if(!alive){tex.dispose();return;}tex.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());uniforms.earth.value=tex;earthLoaded=true;setLoaded(true);},undefined,()=>{if(alive){setLoaded(true);current.current.onStatus('NASA imagery unavailable; showing elevation-derived Earth.');}});loadGrid(0);loadGrid(540);
  const plates=new THREE.Group();scene.add(plates);let plateFail=false;
  const abort=new AbortController();fetch('/plates.json',{signal:abort.signal}).then(r=>{if(!r.ok)throw Error();return r.json();}).then(data=>{if(!alive)return;const vertices:number[]=[];for(const f of (data as {features:{geometry:{type:string;coordinates:number[][]}}[]}).features){if(f.geometry.type!=='LineString')continue;const pts=f.geometry.coordinates;for(let i=1;i<pts.length;i++)vertices.push(...xyz(pts[i-1][1],pts[i-1][0],1.004).toArray(),...xyz(pts[i][1],pts[i][0],1.004).toArray());}const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));plates.add(new THREE.LineSegments(g,new THREE.LineBasicMaterial({color:'#edbb7e',transparent:true,opacity:.7})));}).catch(()=>{plateFail=true;});
  const migration=new THREE.Group();scene.add(migration);const routeLines=routes.map(route=>{const a=xyz(...route.from),b=xyz(...route.to);const points=[];for(let i=0;i<=100;i++){const t=i/100;points.push(a.clone().lerp(b,t).normalize().multiplyScalar(1.009+Math.sin(t*Math.PI)*.045));}const g=new THREE.BufferGeometry().setFromPoints(points);const mat=new THREE.LineDashedMaterial({color:'#e0c191',dashSize:.012,gapSize:.005,transparent:true,opacity:.88});const line=new THREE.Line(g,mat);line.computeLineDistances();migration.add(line);return {route,line};});
@@ -117,18 +117,19 @@ export default function Globe(props:Props){
  const resize=new ResizeObserver(()=>{const w=el.clientWidth,h=el.clientHeight;if(!w||!h)return;renderer.setPixelRatio(Math.min(devicePixelRatio,innerWidth<700?1.5:2,Math.sqrt(3500000/(w*h))));renderer.setSize(w,h);camera.aspect=w/h;const framingScale=Number(getComputedStyle(el).getPropertyValue('--globe-framing-scale'))||1;camera.fov=THREE.MathUtils.radToDeg(2*Math.atan(Math.tan(THREE.MathUtils.degToRad(17))*framingScale));camera.updateProjectionMatrix();});resize.observe(el);
  let frame=0,last=0;function animate(now:number){if(!alive)return;frame=requestAnimationFrame(animate);if(document.hidden||contextUnavailable||now-last<24)return;last=now;
  const {age:requestedAge,layers,selected,autoRotate}=current.current;
- const a=requestedAge>.12&&requestedAge<=540?Math.floor(requestedAge/5)*5:0;
- const b=requestedAge>.12&&requestedAge<=540?Math.min(540,a+5):0;
+ const a=requestedAge>540&&requestedAge<=620?540:requestedAge>.12&&requestedAge<=540?Math.floor(requestedAge/5)*5:0;
+ const b=requestedAge>540&&requestedAge<=620?540:requestedAge>.12&&requestedAge<=540?Math.min(540,a+5):0;
  const key=`${a}:${b}`;
  if(key!==requestKey){requestKey=key;setError('');loadGrid(a);loadGrid(b);if(failed.has(a)||failed.has(b))setError('This scientific reconstruction could not load. Choose another chapter or reload the globe.');}
- const surfaceReady=requestedAge>540||(texCache.has(a)&&texCache.has(b))||(requestedAge<=.12&&earthLoaded);
+ const surfaceReady=requestedAge>620||(texCache.has(a)&&texCache.has(b));
  current.current.onBuffering?.(!surfaceReady);
  if(surfaceReady){
+   if(renderedAge===null)setLoaded(true);
    if(texCache.has(a)&&texCache.has(b)){uniforms.mapA.value=texCache.get(a)!;uniforms.mapB.value=texCache.get(b)!;uniforms.blend.value=a===b?0:(requestedAge-a)/(b-a);}
    renderedAge=requestedAge;
    if(lastLoading){current.current.onStatus('');current.current.onBuffering?.(false);lastLoading=false;}
    // Warm neighboring reconstructions before playback reaches their boundary.
-   if(requestedAge<=560&&requestedAge>.12){for(const offset of [-5,-10,-15,10,15]){const neighbor=a+offset;if(neighbor>=0&&neighbor<=540)loadGrid(neighbor);}}
+   if(requestedAge<=620&&requestedAge>.12){for(const offset of [-5,-10,-15,10,15]){const neighbor=a+offset;if(neighbor>=0&&neighbor<=540)loadGrid(neighbor);}}
  }else if(!lastLoading){current.current.onStatus('Updating reconstruction — holding the last loaded world.');current.current.onBuffering?.(true);lastLoading=true;}
  // Swap complete surfaces atomically; loading must never turn a visible Earth off.
  const age=renderedAge??requestedAge;

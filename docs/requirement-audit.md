@@ -88,3 +88,7 @@ Both timeline labels and their selected-date descriptions now reach the actual r
 ## Graphics recovery verification — 2026-09-12
 
 Actual WEBGL_lose_context extension tests covered both Earth and Human Odyssey during playback. Each slider remained unchanged while the context was lost, then advanced after restoration; screenshots confirmed the planet rendered again. The renderer now propagates context loss through buffering and stops render work until restoration. Human Odyssey obeys buffering and hidden-tab pauses. scripts/check-recovery.cjs preserves the repeatable integration check (Playwright and Chrome required). This does not prove recovery on every mobile GPU.
+
+## Published navigation and surface-boundary regression — 2026-09-12
+
+Reproduced the live Human Odyssey navigation failure: vinext client navigation emitted TypeError errors while the direct page returned HTTP 200. Internal route links now use native document navigation. Verified built Worker preview navigation into Human Odyssey, globe readiness and advancing playback without page errors. Replaced the abrupt 540 Ma procedural/reconstruction switch with a clearly illustrative 620–540 Ma interpolation anchored to the first terrain grid; preloads the 540 Ma grid and neighbors before crossing. Captured 620, 590, 560, 540.01, 539.99, 530 and 510 Ma; the boundary comparison passed the small-change threshold. This is visual continuity, not new evidence for Precambrian geography. Initial readiness now waits for required elevation grids and dismisses the loader when a usable surface is ready.

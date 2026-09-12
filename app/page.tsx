@@ -1,6 +1,5 @@
 'use client';
 import { useState, useEffect, useRef, useCallback } from 'react';
-import Link from 'next/link';
 import {
   Orbit,
   Play,
@@ -450,10 +449,10 @@ export default function Home() {
       </a>
       <div className="chamber">
         <header className="topbar">
-          <Link className="brand" href="/" aria-label="AEON home">
+          <a className="brand" href="/" aria-label="AEON home">
             <Orbit size={30} />
             <span>AEON</span>
-          </Link>
+          </a>
           <span className="brand-note">
             A LIVING HISTORY
             <br />
@@ -464,10 +463,10 @@ export default function Home() {
               <Globe2 size={15} />
               Explore Earth
             </button>
-            <Link href="/human-odyssey">
+            <a href="/human-odyssey">
               <Users size={15} />
               Human Odyssey
-            </Link>
+            </a>
             <button onClick={() => setDrawer('eras')}>
               <Clock3 size={15} />
               Era explorer
