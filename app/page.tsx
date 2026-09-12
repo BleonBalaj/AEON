@@ -919,6 +919,7 @@ export default function Home() {
             </div>
             <Slider
               aria-label="Time travel position"
+              aria-valuetext={formatAge(age)}
               min={0}
               max={100}
               step={0.01}

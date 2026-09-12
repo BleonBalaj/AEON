@@ -80,3 +80,7 @@ Human Odyssey now reports the interpolated global sea level and identifies Berin
 ## Surface interpretation follow-up — 2026-09-09
 
 Separated early low-growing vegetation from the illustrative Devonian forest expansion, following Davies et al. (2024). Globe caption now distinguishes PALEOMAP terrain from illustrative surface colors. Neither the climate belts nor circular Ice Age masks are imported vegetation/ice reconstructions; exact extents remain unresolved. Corrected the coarse sea-level ramp so mid/late-Holocene cities no longer show Ice Age land bridges. This remains an approximate global illustration, not a local relative-sea-level reconstruction. Accessibility changes retain explicit search and switch names, internal links, and pure playback updates. Keyboard atlas search and selection were exercised; full accessibility coverage remains open.
+
+## Timeline accessibility verification — 2026-09-12
+
+Both timeline labels and their selected-date descriptions now reach the actual range inputs rather than only their wrapper. Browser accessibility inspection verified the named Earth and Human Odyssey sliders. Keyboard Home/End changed Earth from present to 4.54 Ga and back; Human Odyssey End reported Many beginnings: 120,000 years ago. These checks prove slider naming and endpoint behavior, not full screen-reader compatibility or a complete accessibility audit.
