@@ -103,9 +103,14 @@ export default function Globe(props:Props){
  const starGeometry=new THREE.BufferGeometry();starGeometry.setAttribute('position',new THREE.BufferAttribute(starArray,3));const stars=new THREE.Points(starGeometry,new THREE.PointsMaterial({color:'#93b3bf',size:.014,transparent:true,opacity:.48}));scene.add(stars);
  const texCache=new Map<number,THREE.Texture>(),pending=new Set<number>(),failed=new Set<number>();const loader=new THREE.TextureLoader();let renderedAge:number|null=null;let requestKey='';let earthLoaded=false;let lastLoading=false;
  const queue:number[]=[];let activeLoads=0,prewarmed=false;
- function pumpGrids(){while(alive&&activeLoads<4&&queue.length){const gridAge=queue.shift()!;activeLoads++;loader.load('/paleo/'+gridAge+'.png',tex=>{
- activeLoads--;pending.delete(gridAge);if(!alive){tex.dispose();return;}tex.minFilter=THREE.LinearFilter;tex.magFilter=THREE.LinearFilter;tex.generateMipmaps=false;texCache.set(gridAge,tex);pumpGrids();
- },undefined,()=>{activeLoads--;pending.delete(gridAge);failed.add(gridAge);if(alive&&requestKey.split(':').map(Number).includes(gridAge)){current.current.onStatus('The selected reconstruction could not load.');setError('This scientific reconstruction could not load. Choose another chapter or reload the globe.');}pumpGrids();});}}
+ const loadTimers=new Set<ReturnType<typeof setTimeout>>();
+ function pumpGrids(){while(alive&&activeLoads<4&&queue.length){const gridAge=queue.shift()!;activeLoads++;let settled=false;
+ const finish=()=>{if(settled)return false;settled=true;clearTimeout(timer);loadTimers.delete(timer);activeLoads--;pending.delete(gridAge);return true;};
+ const fail=()=>{if(!finish()||!alive)return;failed.add(gridAge);if(requestKey.split(':').map(Number).includes(gridAge)){current.current.onStatus('The selected reconstruction could not load.');setError('The selected terrain did not finish loading. Check your connection and reload the globe to retry.');}pumpGrids();};
+ const timer=setTimeout(fail,12000);loadTimers.add(timer);
+ loader.load('/paleo/'+gridAge+'.png',tex=>{
+ if(!finish()||!alive){tex.dispose();return;}tex.minFilter=THREE.LinearFilter;tex.magFilter=THREE.LinearFilter;tex.generateMipmaps=false;texCache.set(gridAge,tex);pumpGrids();
+ },undefined,fail);}}
  function loadGrid(gridAge:number,priority=true){if(texCache.has(gridAge)||failed.has(gridAge))return;if(pending.has(gridAge)){const queued=queue.indexOf(gridAge);if(priority&&queued>=0){queue.splice(queued,1);queue.unshift(gridAge);}return;}pending.add(gridAge);if(priority)queue.unshift(gridAge);else queue.push(gridAge);pumpGrids();}
  loader.load('/textures/earth.webp',tex=>{if(!alive){tex.dispose();return;}tex.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());uniforms.earth.value=tex;earthLoaded=true;setLoaded(true);},undefined,()=>{if(alive){setLoaded(true);current.current.onStatus('NASA imagery unavailable; showing elevation-derived Earth.');}});loadGrid(0);loadGrid(540);
  const plates=new THREE.Group();scene.add(plates);let plateFail=false;
@@ -154,7 +159,7 @@ export default function Globe(props:Props){
  if(focusTarget){camera.position.lerp(focusTarget,reduced?1:.07);if(camera.position.distanceTo(focusTarget)<.005)focusTarget=null;}
  controls.autoRotate=autoRotate&&!reduced&&!focusTarget;controls.update();renderer.render(scene,camera);
  }frame=requestAnimationFrame(animate);
- return()=>{alive=false;abort.abort();cancelAnimationFrame(frame);resize.disconnect();controls.dispose();renderer.domElement.removeEventListener('pointerdown',pointerdown);renderer.domElement.removeEventListener('pointerup',pointerup);renderer.domElement.removeEventListener('keydown',key);renderer.domElement.removeEventListener('webglcontextlost',contextLost);renderer.domElement.removeEventListener('webglcontextrestored',contextRestored);disposeTree(scene);ringGeo.dispose();dotGeo.dispose();dotMat.dispose();for(const t of texCache.values())t.dispose();uniforms.earth.value.dispose();fallback.dispose();renderer.dispose();renderer.domElement.remove();};
+ return()=>{alive=false;for(const timer of loadTimers)clearTimeout(timer);loadTimers.clear();abort.abort();cancelAnimationFrame(frame);resize.disconnect();controls.dispose();renderer.domElement.removeEventListener('pointerdown',pointerdown);renderer.domElement.removeEventListener('pointerup',pointerup);renderer.domElement.removeEventListener('keydown',key);renderer.domElement.removeEventListener('webglcontextlost',contextLost);renderer.domElement.removeEventListener('webglcontextrestored',contextRestored);disposeTree(scene);ringGeo.dispose();dotGeo.dispose();dotMat.dispose();for(const t of texCache.values())t.dispose();uniforms.earth.value.dispose();fallback.dispose();renderer.dispose();renderer.domElement.remove();};
  },[retry]);
  return <div className="globe-host" ref={host}>{!loaded&&!error&&<div className="globe-loading"><span/> Bringing Earth into view</div>}{waiting&&loaded&&!error&&<div className="globe-pending" role="status">Updating selected world…</div>}{error&&<div className="globe-error"><p>{error}</p><button onClick={()=>{setError('');setRetry(x=>x+1);}}>Reload globe</button></div>}</div>;
 }
