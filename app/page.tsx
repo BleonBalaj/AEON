@@ -202,17 +202,6 @@ export default function Home() {
     setStarted(true);
     setAge(event.age);
     setSelected(event);
-    setScale(
-      event.age <= 0.012
-        ? 4
-        : event.age <= 0.3
-          ? 3
-          : event.age <= 10
-            ? 2
-            : event.age <= 540
-              ? 1
-              : 0,
-    );
     if (event.location) api.current?.focus(...event.location);
     setLayers((l) => ({ ...l, life: event.category === 'Life' || l.life }));
     if (details) setDrawer('details');
@@ -221,8 +210,7 @@ export default function Home() {
   }, []);
   const startJourney = () => {
     setStarted(true);
-    setAge(4540);
-    setScale(0);
+    setAge(scales[scale].max);
     setSelected(null);
     setPlaying(true);
     api.current?.reset();
@@ -345,17 +333,6 @@ export default function Home() {
             setStarted(true);
             setSelected(null);
             setAge(value);
-            setScale(
-              value <= 0.012
-                ? 4
-                : value <= 0.3
-                  ? 3
-                  : value <= 10
-                    ? 2
-                    : value <= 540
-                      ? 1
-                      : 0,
-            );
             await new Promise((resolve) =>
               requestAnimationFrame(() => requestAnimationFrame(resolve)),
             );
@@ -994,7 +971,9 @@ export default function Home() {
           </div>
           <div className="timeline-foot">
             <span>
-              {scale === 0
+              {age > scales[scale].max
+                ? 'Selected date is outside this scale. Choose a wider time scale to scrub here.'
+                : scale === 0
                 ? 'Adaptive scale · Recent history is expanded for exploration'
                 : 'Linear scale within this time window'}{' '}
               {playing && ' · Playing'}
@@ -1514,7 +1493,6 @@ export default function Home() {
                     setStarted(true);
                     setPlaying(false);
                     setSelected(null);
-                    setScale(a <= 540 ? 1 : 0);
                     setAge(a);
                   }}
                 >
