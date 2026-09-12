@@ -84,3 +84,7 @@ Separated early low-growing vegetation from the illustrative Devonian forest exp
 ## Timeline accessibility verification — 2026-09-12
 
 Both timeline labels and their selected-date descriptions now reach the actual range inputs rather than only their wrapper. Browser accessibility inspection verified the named Earth and Human Odyssey sliders. Keyboard Home/End changed Earth from present to 4.54 Ga and back; Human Odyssey End reported Many beginnings: 120,000 years ago. These checks prove slider naming and endpoint behavior, not full screen-reader compatibility or a complete accessibility audit.
+
+## Graphics recovery verification — 2026-09-12
+
+Actual WEBGL_lose_context extension tests covered both Earth and Human Odyssey during playback. Each slider remained unchanged while the context was lost, then advanced after restoration; screenshots confirmed the planet rendered again. The renderer now propagates context loss through buffering and stops render work until restoration. Human Odyssey obeys buffering and hidden-tab pauses. scripts/check-recovery.cjs preserves the repeatable integration check (Playwright and Chrome required). This does not prove recovery on every mobile GPU.
