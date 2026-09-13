@@ -100,3 +100,9 @@ Removed automatic scale changes from date jumps, chapter/search selections, comp
 ## Stalled terrain request recovery — 2026-09-12
 
 Terrain loads now time out after 12 seconds, release their queue slot, and ignore/dispose late responses. Cleanup clears timers. A production-preview network test deliberately held the 65 Ma raster while selecting 66 Ma: the pending indicator appeared, the prior valid surface remained visible, a recoverable error appeared, and Reload globe successfully rendered 66 Ma while preserving Deep time. scripts/check-network.cjs reproduces this scenario. This validates stalled-request recovery, not arbitrary offline operation.
+
+## Historical surface treatment — 2026-09-13
+
+Replaced the nearly uniform historical tan/olive palette with darker forest material, regional texture, elevation-derived slope shading, and illustrative Paleogene-to-Neogene moisture changes. Antarctic and northern polar cap onset now use separate continuous weights. Modern satellite reference blends over the last 5 Ma rather than abruptly switching at 120 ka; this blend is a visual approximation, not historical satellite evidence. Underlying 5 Ma PaleoDEM grids remain unchanged. Sources informing broad ecological succession: https://www.nature.com/articles/s41467-021-27897-y and https://www.nature.com/articles/s41467-022-32300-5. These support regional, asynchronous changes, not the exact rendered biome boundaries. Historical surface colors and fine texture remain illustrative.
+
+TypeScript and data verification passed. Local browser checks rendered 66, 34, 20, 5 Ma, 21 ka and 500 years; screenshots at 66 and 20 Ma visually inspected for changed coastlines and surface character. Rapid selection, preserved Deep time scale, Human Odyssey navigation and playback passed. This improves a visible defect but does not establish full scientific or visual acceptance of every age.

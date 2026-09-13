@@ -42,10 +42,17 @@ void main(){
  float plants=mix(pioneers,1.,forests);
  float equator=1.-smoothstep(.10,.38,lat);float subtropics=exp(-pow((lat-.34)/.16,2.));
  float pangaeaDry=smoothstep(180.,235.,age)*(1.-smoothstep(315.,335.,age));
- float moisture=clamp(.18+equator*.52+(rough-.5)*.72-subtropics*.18-pangaeaDry*(.24+.22*rough),0.,1.);
- vec3 mineral=mix(vec3(.40,.34,.235),vec3(.29,.255,.19),rough);
- vec3 dryland=mix(vec3(.48,.37,.205),vec3(.34,.285,.18),rough);
- vec3 green=mix(vec3(.11,.245,.14),vec3(.22,.34,.18),rough);
+ // Qualitative climate succession, not a reconstructed vegetation dataset.
+ // Warm Paleogene forest belts give way gradually to more open Neogene land.
+ float cenozoic=1.-smoothstep(66.,75.,age);
+ float warmPaleogene=smoothstep(23.,50.,age)*cenozoic;
+ float openNeogene=(1.-smoothstep(7.,28.,age))*cenozoic;
+ float regional=fbm(p*12.3+vec3(8.,2.,5.));
+ float temperate=exp(-pow((lat-.66)/.27,2.));
+ float moisture=clamp(.20+equator*.65+temperate*.38+(regional-.48)*1.6-subtropics*.27-pangaeaDry*(.24+.22*rough)+warmPaleogene*(.30+.22*lat)-openNeogene*.15,0.,1.);
+ vec3 mineral=mix(vec3(.23,.17,.095),vec3(.12,.105,.077),rough);
+ vec3 dryland=mix(vec3(.34,.235,.105),vec3(.16,.135,.055),rough);
+ vec3 green=mix(vec3(.014,.065,.018),vec3(.042,.125,.033),rough);
  vec3 low=mix(mineral,mix(dryland,green,moisture),plants);
  // Carboniferous wetlands were concentrated in humid tropical basins, while
  // Permian and Triassic Pangaea developed extensive seasonal dry interiors.
@@ -54,14 +61,25 @@ void main(){
  low=mix(low,dryland,pangaeaDry*(.24+.26*subtropics));
  if(age>470.)low=mineral;
  low=mix(low,mix(vec3(.21,.19,.16),vec3(.08,.075,.07),youngCrust),early);
- vec3 ground=mix(low,vec3(.42,.40,.34),smoothstep(500.,5000.,h));ground*=.78+rough*.45;
+ // Resolve relief from the elevation field itself. Fine texture is illustrative;
+ // it adds material detail without inventing additional continental boundaries.
+ float fine=fbm(p*240.);
+ vec2 du=vec2(1./361.,0.),dv=vec2(0.,1./181.);
+ float hx=mix(heightAt(mapA,vUv+du)-heightAt(mapA,vUv-du),heightAt(mapB,vUv+du)-heightAt(mapB,vUv-du),blend);
+ float hy=mix(heightAt(mapA,vUv+dv)-heightAt(mapA,vUv-dv),heightAt(mapB,vUv+dv)-heightAt(mapB,vUv-dv),blend);
+ float relief=clamp(1.+(hx*.00016+hy*.00023)*(1.-early),.52,1.35);
+ vec3 ground=mix(low,vec3(.24,.22,.18),smoothstep(1600.,5500.,h));
+ ground*=relief*(.68+rough*.42+fine*.40);
  vec3 base=mix(ocean,ground,land);
  // Bathymetry becomes land as global sea level falls. A subdued mineral tint
  // makes Beringia, Sunda and Sahul legible without implying exact vegetation.
  float exposedShelf=glacial*land*(1.-smoothstep(-12.,18.,h))*smoothstep(sea-30.,sea+35.,h);
  base=mix(base,mix(vec3(.34,.31,.225),vec3(.22,.285,.235),equator*.35),exposedShelf*.72);
  vec3 sat=pow(texture2D(earth,vUv).rgb,vec3(2.2));float glacialSurface=ice*clamp(pleistoceneIce+abs(seaLevel)/60.,0.,1.);base=mix(base,sat,modern*(1.-glacialSurface));
- float cap=smoothstep(.91,.98,lat)*step(age,34.);float paleoIce=ancientIce;cap=max(cap,paleoIce*smoothstep(.02,.28,lat));
+ // Antarctic growth and northern ice are separate, continuous transitions.
+ float cap=smoothstep(.90,.98,-p.y)*(1.-smoothstep(30.,35.,age));
+ cap=max(cap,smoothstep(.97,.995,p.y)*(1.-smoothstep(2.5,3.5,age)));
+ float paleoIce=ancientIce;cap=max(cap,paleoIce*smoothstep(.02,.28,lat));
  float gondwanaIce=latePaleoIce*smoothstep(.43,.82,-p.y)*land;cap=max(cap,gondwanaIce);
  // Simplified geographic footprints, guided by PaleoMIST rather than the
  // former screen-space blobs. Margins remain illustrative at this resolution.
@@ -147,7 +165,9 @@ export default function Globe(props:Props){
  renderer.domElement.dataset.renderedAge=String(renderedAge??'');renderer.domElement.dataset.requestedAge=String(requestedAge);renderer.domElement.dataset.loading=String(!surfaceReady);
  uniforms.age.value=age;uniforms.ancientIce.value=cryogenianIce(age);uniforms.latePaleoIce.value=latePaleozoicIce(age)*+layers.ice;uniforms.pleistoceneIce.value=latePleistoceneIce(age)*+layers.ice;uniforms.seaLevel.value=seaLevel(age);uniforms.clouds.value=+layers.clouds;uniforms.climate.value=+layers.climate;uniforms.ice.value=+layers.ice;uniforms.grid.value=+layers.grid;uniforms.tick.value=reduced?0:now/1000;
  air.visible=planet.visible&&age<4400&&layers.clouds;
- uniforms.modern.value=age<=.12&&earthLoaded?1:0;
+ // Fade in the modern reference only within the most recent terrain interval.
+ // Avoid the former binary detail pop at 120,000 years.
+ uniforms.modern.value=earthLoaded?1-THREE.MathUtils.smoothstep(age,0,5):0;
  plates.visible=layers.plates&&age<=.3;if(plateFail&&plates.visible)current.current.onStatus('Plate boundaries could not load.');
  migration.visible=layers.migration&&age<=.3;for(const {route,line}of routeLines){const progress=THREE.MathUtils.clamp((route.start-age)/(route.start-route.end),0,1);line.visible=progress>0&&(!current.current.routeIds||current.current.routeIds.includes(route.id));line.geometry.setDrawRange(0,Math.max(2,Math.floor(progress*101)));}
  const dotKey=[Math.round(age*100000),layers.life,layers.humans,layers.civilization,selected?.id].join(':');if(dotKey!==lastDots){lastDots=dotKey;for(const c of dots.children){c.traverse(o=>{if(o instanceof THREE.Mesh&&o.material!==dotMat)(o.material as THREE.Material).dispose();});}dots.clear();clickable.length=0;
