@@ -2,6 +2,7 @@
 import {useEffect,useRef,useState} from 'react';
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import TectonicGlobe from './tectonic-globe';
 import {routes,hominins} from '@/lib/earth/migration';
 import {events,EarthEvent,seaLevel,cryogenianIce,latePaleozoicIce,latePleistoceneIce} from '@/lib/earth/history';
 export type Layers={clouds:boolean;plates:boolean;climate:boolean;ice:boolean;life:boolean;humans:boolean;migration:boolean;civilization:boolean;grid:boolean};
@@ -101,6 +102,9 @@ void main(){
 function xyz(lat:number,lon:number,r=1){const a=THREE.MathUtils.degToRad(lat),b=THREE.MathUtils.degToRad(lon);return new THREE.Vector3(Math.cos(a)*Math.cos(b)*r,Math.sin(a)*r,-Math.cos(a)*Math.sin(b)*r);}
 function disposeTree(obj:THREE.Object3D){obj.traverse(o=>{const m=o as THREE.Mesh;if(m.geometry)m.geometry.dispose();if(m.material){for(const a of Array.isArray(m.material)?m.material:[m.material])a.dispose();}});}
 export default function Globe(props:Props){
+ return props.layers.plates&&props.age>.3&&props.age<=1800?<TectonicGlobe {...props}/>:<TerrainGlobe {...props}/>;
+}
+function TerrainGlobe(props:Props){
  const host=useRef<HTMLDivElement>(null),current=useRef(props);
  useEffect(()=>{current.current=props;},[props]);
  const [error,setError]=useState(''),[retry,setRetry]=useState(0);const [loaded,setLoaded]=useState(false),[waiting,setWaiting]=useState(false);

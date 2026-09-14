@@ -1,6 +1,8 @@
 export type Category = 'Planet'|'Life'|'Climate'|'Extinction'|'Humanity'|'Migration'|'Civilization';
 export type EarthEvent = {id:string;age:number;title:string;category:Category;date:string;description:string;importance:string;place:string;certainty:string;sources:string[];keywords?:string;location?:[number,number]};
 export const sources:Record<string,{name:string;url:string}>={
+ tectonics:{name:'Cao et al. (2024) · 1.8 billion years of plate evolution',url:'https://doi.org/10.1016/j.gsf.2024.101922'},
+ gplates:{name:'GPlates Web Service · Reconstruction models and limitations',url:'https://gwsdoc.gplates.org/models/'},
  earlyForests:{name:'Davies et al. (2024) · Middle Devonian forests',url:'https://doi.org/10.1144/jgs2023-204'},
  cryogenian:{name:'Thomas & Catling (2024) · Cryogenian glaciations',url:'https://www.nature.com/articles/s41467-024-51412-8'},
  earlyClimate:{name:'NASA Astrobiology · Habitability of the young Earth',url:'https://astrobiology.nasa.gov/news/habitability-of-the-young-earth-could-boost-the-chances-of-life-elsewhere/'},

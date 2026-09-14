@@ -116,7 +116,7 @@ const layerDefs: {
     key: 'plates',
     name: 'Plate tectonics',
     icon: Layers3,
-    help: 'PB2002 present-day boundaries. Ancient views show reconstructed land and oceans, not invented plate boundaries.',
+    help: 'Present-day PB2002 boundaries. From 1 to 1,800 million years ago, a dedicated CAO2024 tectonic globe shows matching coastline outlines and boundaries at the nearest million-year snapshot. Colors: amber subduction, cyan ridges, violet transforms, gray other features. This view is a different reconstruction from the terrain globe.',
   },
   {
     key: 'climate',
@@ -532,9 +532,11 @@ export default function Home() {
               </div>
             </div>
           )}
-          <div className="globe-caption">
+          <div className={`globe-caption${layers.plates && age > .3 && age <= 1800 ? ' tectonic-caption' : ''}`}>
             <span className="live-dot" />{' '}
-            {age > 540
+            {layers.plates && age > .3 && age <= 1800
+              ? 'CAO2024 · TECTONIC RECONSTRUCTION'
+              : age > 540
               ? age > 4460
                 ? 'ILLUSTRATION · COOLING EARTH'
                 : age > 4031
@@ -630,7 +632,7 @@ export default function Home() {
             </button>
             {layers.plates && age > 0.3 && (
               <p className="layer-notice">
-                Modern plate boundaries are hidden in ancient views.
+                {age <= 1800 ? 'Tectonic view · amber subduction · cyan ridges · violet transforms. Coastlines and boundaries use CAO2024; snapshots are rounded to 1 Ma.' : 'Plate reconstructions are available within the last 1.8 billion years.'}
               </p>
             )}
             {layers.migration && (
@@ -1266,6 +1268,7 @@ export default function Home() {
                   temperature, oxygen or CO₂ series is implied.
                 </p>
                 <h3>Data credits</h3>
+                <p>Historical tectonic mode uses Cao et al. (2024) through the GPlates Web Service. Coastline outlines and boundary types share that model; positions are uncertain, especially in deep time. This diagram does not show reconstructed elevation or exact ancient shorelines. It loads the nearest million-year snapshot and requires a network connection.</p>
                 <p>
                   PALEOMAP PaleoDEMs: Scotese, C.R. & Wright, N. (2018), CC BY
                   4.0. Elevation encoding, rendering and interpolation adapted.
@@ -1281,6 +1284,8 @@ export default function Home() {
                     'paleo',
                     'nasa',
                     'plates',
+                    'tectonics',
+                    'gplates',
                     'ics',
                     'human',
                     'migration',
