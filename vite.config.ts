@@ -41,12 +41,13 @@ export default defineConfig(async () => {
   process.env.WRANGLER_LOG_PATH ??= '.wrangler/logs';
   process.env.MINIFLARE_REGISTRY_PATH ??= '.wrangler/registry';
 
-  // GitHub Pages needs a pure static build. Keep the Cloudflare/OpenAI hosting
-  // plugins for the original local/Workers workflow, but omit them in Pages CI.
+  // GitHub Pages needs a pure static build. Force prerendering because Vinext's
+  // static analyzer currently classifies these client-heavy App Router pages as
+  // unknown even though they are safe to render at build time.
   if (process.env.GITHUB_PAGES === 'true') {
     return {
       css: { postcss: { plugins: [tailwindcss()] } },
-      plugins: [vinext()],
+      plugins: [vinext({ prerender: { routes: '*' } })],
     };
   }
 
