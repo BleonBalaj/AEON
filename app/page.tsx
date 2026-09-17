@@ -30,8 +30,17 @@ import {
   GitCompareArrows,
   Flame,
   Activity,
+  Volume2,
+  VolumeX,
+  MapPin,
+  Crosshair,
+  MoveRight,
+  X,
 } from 'lucide-react';
+import Link from 'next/link';
 import Globe, { GlobeApi, Layers } from '@/components/earth-globe';
+import { toggleAmbience, subscribeAmbience } from '@/lib/earth/ambience';
+import { paleoCities, getPaleoCityLocation, PaleoCity } from '@/lib/earth/paleo-cities';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import {
@@ -114,9 +123,9 @@ const layerDefs: {
   },
   {
     key: 'plates',
-    name: 'Plate tectonics',
+    name: 'Plate boundaries',
     icon: Layers3,
-    help: 'Present-day PB2002 boundaries. From 1 to 1,800 million years ago, a dedicated CAO2024 tectonic globe shows matching coastline outlines and boundaries at the nearest million-year snapshot. Colors: amber subduction, cyan ridges, violet transforms, gray other features. This view is a different reconstruction from the terrain globe.',
+    help: 'Present-day PB2002 tectonic plate boundaries (mid-ocean ridges, subduction zones, and fault lines). In deep time, plate movements and continental drift are reconstructed directly by the planetary terrain.',
   },
   {
     key: 'climate',
@@ -142,6 +151,12 @@ const layerDefs: {
     icon: Compass,
     help: 'A coordinate reference grid. Ancient longitudes carry substantial uncertainty.',
   },
+  {
+    key: 'ghost',
+    name: 'Modern continent ghost',
+    icon: Globe2,
+    help: 'Translucent outline of modern continental borders to orient yourself on ancient supercontinents like Pangaea and Rodinia.',
+  },
 ];
 const defaults: Layers = {
   clouds: true,
@@ -153,8 +168,11 @@ const defaults: Layers = {
   migration: false,
   civilization: false,
   grid: false,
+  ghost: false,
 };
 export default function Home() {
+  const [audioOn, setAudioOn] = useState(false);
+  useEffect(() => subscribeAmbience(setAudioOn), []);
   const [age, setAge] = useState(0),
     [scale, setScale] = useState(0),
     [playing, setPlaying] = useState(false),
@@ -164,6 +182,9 @@ export default function Home() {
     [layers, setLayers] = useState<Layers>(defaults),
     [autoRotate, setAutoRotate] = useState(true),
     [status, setStatus] = useState('');
+  const [selectedCity, setSelectedCity] = useState<PaleoCity | null>(null),
+    [cityPicker, setCityPicker] = useState(false),
+    [citySearch, setCitySearch] = useState('');
   const [drawer, setDrawer] = useState<
       'eras' | 'layers' | 'details' | 'sources' | null
     >(null),
@@ -175,6 +196,7 @@ export default function Home() {
     [compare, setCompare] = useState(false),
     [savedAge, setSavedAge] = useState<number | null>(null),
     [full, setFull] = useState(false);
+  const pinnedCityLocation = selectedCity ? getPaleoCityLocation(selectedCity, age) : null;
   const buffering = useRef(false);
   const onBuffering = useCallback((waiting: boolean) => {
     buffering.current = waiting;
@@ -261,10 +283,13 @@ export default function Home() {
   }, [playing, speed, scale]);
   useEffect(() => {
     const fn = (e: KeyboardEvent) => {
+      const isInput = e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement;
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
         setSearch((v) => !v);
+        return;
       }
+      if (isInput) return;
       if (
         e.code === 'Space' &&
         e.target === document.body &&
@@ -275,11 +300,26 @@ export default function Home() {
       ) {
         e.preventDefault();
         setPlaying((v) => !v);
+      } else if ((e.key === 'r' || e.key === 'R') && !drawer && !search && !compression && !compare) {
+        e.preventDefault();
+        api.current?.reset();
+      } else if ((e.key === 'm' || e.key === 'M') && !drawer && !search && !compression && !compare) {
+        e.preventDefault();
+        toggleAmbience();
+      } else if ((e.key === '+' || e.key === '=') && !drawer && !search && !compression && !compare) {
+        e.preventDefault();
+        api.current?.zoom(0.85);
+      } else if ((e.key === '-' || e.key === '_') && !drawer && !search && !compression && !compare) {
+        e.preventDefault();
+        api.current?.zoom(1.15);
+      } else if ((e.key === 'c' || e.key === 'C') && !drawer && !search && !compression && !compare) {
+        e.preventDefault();
+        setCityPicker((v) => !v);
       }
     };
     window.addEventListener('keydown', fn);
     return () => window.removeEventListener('keydown', fn);
-  }, [drawer, search, compression, compare]);
+  }, [drawer, search, compression, compare, cityPicker]);
   useEffect(() => {
     const fn = () => setFull(!!document.fullscreenElement);
     document.addEventListener('fullscreenchange', fn);
@@ -426,10 +466,10 @@ export default function Home() {
       </a>
       <div className="chamber">
         <header className="topbar">
-          <a className="brand" href="/" aria-label="AEON home">
+          <Link className="brand" href="/" aria-label="AEON home">
             <Orbit size={30} />
             <span>AEON</span>
-          </a>
+          </Link>
           <span className="brand-note">
             A LIVING HISTORY
             <br />
@@ -440,10 +480,10 @@ export default function Home() {
               <Globe2 size={15} />
               Explore Earth
             </button>
-            <a href="/human-odyssey">
+            <Link href="/human-odyssey">
               <Users size={15} />
               Human Odyssey
-            </a>
+            </Link>
             <button onClick={() => setDrawer('eras')}>
               <Clock3 size={15} />
               Era explorer
@@ -473,6 +513,7 @@ export default function Home() {
             autoRotate={autoRotate}
             onStatus={setStatus}
             onBuffering={onBuffering}
+            pinnedLocation={pinnedCityLocation ? { lat: pinnedCityLocation.lat, lon: pinnedCityLocation.lon, name: selectedCity?.name || '' } : null}
           />
           <div className="intro">
             <div className="eyebrow">
@@ -532,11 +573,9 @@ export default function Home() {
               </div>
             </div>
           )}
-          <div className={`globe-caption${layers.plates && age > .3 && age <= 1800 ? ' tectonic-caption' : ''}`}>
+          <div className="globe-caption">
             <span className="live-dot" />{' '}
-            {layers.plates && age > .3 && age <= 1800
-              ? 'CAO2024 · TECTONIC RECONSTRUCTION'
-              : age > 540
+            {age > 540
               ? age > 4460
                 ? 'ILLUSTRATION · COOLING EARTH'
                 : age > 4031
@@ -550,12 +589,14 @@ export default function Home() {
                 ? 'PALEOMAP TERRAIN · ILLUSTRATIVE SURFACE'
                 : age > 0.012 && layers.ice
                   ? 'APPROXIMATE GLACIAL GEOGRAPHY'
-                  : 'NASA BLUE MARBLE · MODERN EARTH'}
+                  : age >= .0045 && age <= .0117
+                    ? 'HOLOCENE · ILLUSTRATIVE GREENER SAHARA'
+                    : 'NASA BLUE MARBLE · MODERN EARTH'}
             <span className="caption-sub">
               {status ||
                 (age > 540
                   ? 'Land positions and surface colors are illustrative'
-                  : 'Drag to rotate · Scroll or pinch to zoom')}
+                  : 'Drag to rotate · Scroll or pinch to zoom · Double-click to center')}
             </span>
           </div>
           <aside className="context">
@@ -614,7 +655,7 @@ export default function Home() {
               </button>
             </div>
             {layerDefs
-              .filter((l) => ['plates', 'life', 'ice'].includes(l.key))
+              .filter((l) => ['ghost', 'plates', 'life', 'ice'].includes(l.key))
               .map((l) => (
                 <label className="layer-row" key={l.key} htmlFor={`quick-layer-${l.key}`}>
                   <l.icon size={15} />
@@ -630,9 +671,16 @@ export default function Home() {
             <button className="all-layers" onClick={() => setDrawer('layers')}>
               All layers <ChevronRight size={14} />
             </button>
-            {layers.plates && age > 0.3 && (
+            {layers.ghost && age > 0.3 && (
               <p className="layer-notice">
-                {age <= 1800 ? 'Tectonic view · amber subduction · cyan ridges · violet transforms. Coastlines and boundaries use CAO2024; snapshots are rounded to 1 Ma.' : 'Plate reconstructions are available within the last 1.8 billion years.'}
+                Modern ghost overlay active · Fine golden contours indicate modern continental reference positions.
+              </p>
+            )}
+            {layers.plates && (
+              <p className="layer-notice">
+                {age <= 0.3
+                  ? 'Modern tectonic plates (PB2002) · Mid-ocean ridges, fault lines & subduction zones.'
+                  : 'Modern plate boundaries active. In deep time, continental drift is reconstructed directly in the planetary terrain.'}
               </p>
             )}
             {layers.migration && (
@@ -697,6 +745,14 @@ export default function Home() {
             >
               <Maximize2 size={16} />
             </button>
+            <button
+              aria-label={audioOn ? 'Mute ambient soundscape (M)' : 'Play ambient soundscape (M)'}
+              title={audioOn ? 'Mute ambient soundscape (M)' : 'Play ambient soundscape (M)'}
+              className={audioOn ? 'on' : ''}
+              onClick={toggleAmbience}
+            >
+              {audioOn ? <Volume2 size={16} /> : <VolumeX size={16} />}
+            </button>
           </div>
           <button
             className="mobile-layer-toggle"
@@ -704,22 +760,101 @@ export default function Home() {
           >
             <Layers3 size={17} /> Layers
           </button>
+          {selectedCity && pinnedCityLocation && (
+            <aside className="city-hud" aria-label="Crustal paleolocation tracker">
+              <div className="city-hud-header">
+                <div className="city-hud-title">
+                  <MapPin size={13} />
+                  <span>CRUSTAL TRACKER</span>
+                </div>
+                <button
+                  onClick={() => setSelectedCity(null)}
+                  aria-label="Close crustal tracker"
+                  title="Clear city pin"
+                  className="city-hud-close"
+                >
+                  <X size={13} />
+                </button>
+              </div>
+
+              <div className="city-hud-body">
+                <div className="city-hud-name-row">
+                  <strong>{selectedCity.name}</strong>
+                  <span className="city-hud-country">{selectedCity.country}</span>
+                </div>
+
+                {age <= 540 ? (
+                  <>
+                    <div className="city-hud-coords">
+                      <Compass size={13} />
+                      <span>
+                        {Math.abs(pinnedCityLocation.lat)}° {pinnedCityLocation.lat >= 0 ? 'N' : 'S'},{' '}
+                        {Math.abs(pinnedCityLocation.lon)}° {pinnedCityLocation.lon >= 0 ? 'E' : 'W'}
+                        {Math.abs(pinnedCityLocation.lat) < 5 ? ' · (Near Equator)' : ''}
+                      </span>
+                    </div>
+
+                    <p className="city-hud-env">{pinnedCityLocation.environment}</p>
+
+                    {age > 0 && pinnedCityLocation.driftKm > 0 && (
+                      <div className="city-hud-drift">
+                        <MoveRight size={13} />
+                        <span>
+                          Drifted <strong>{pinnedCityLocation.driftKm.toLocaleString()} km</strong> {pinnedCityLocation.direction}
+                        </span>
+                      </div>
+                    )}
+
+                    <div className="city-hud-actions">
+                      <button
+                        className="city-hud-focus-btn"
+                        onClick={() => api.current?.focus(pinnedCityLocation.lat, pinnedCityLocation.lon)}
+                        title="Rotate globe to center on city"
+                      >
+                        <Crosshair size={12} /> Center on city
+                      </button>
+                      <button
+                        className="city-hud-change-btn"
+                        onClick={() => setCityPicker(true)}
+                      >
+                        Change
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <p className="city-hud-notice">
+                    Plate motions are calibrated for the last 540 million years. Earlier Precambrian worlds are illustrative.
+                  </p>
+                )}
+              </div>
+            </aside>
+          )}
+
           <div className="bottom-workspace">
             <button onClick={() => setCompression(true)}>
               <Clock3 size={14} />
               <span>Earth in a day</span>
             </button>
-            <span className="orientation">
-              N <span>↑</span>
-            </span>
             <button
-              onClick={() => {
-                setSavedAge(age);
-                setCompare(true);
-              }}
+              className="orientation"
+              onClick={() => api.current?.reset()}
+              title="Align globe to North (R)"
+              aria-label="Align globe to North"
             >
-              <GitCompareArrows size={14} />
-              <span>Compare worlds</span>
+              N <span>↑</span>
+            </button>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setCityPicker(true);
+              }}
+              className={`city-trigger-btn ${selectedCity ? 'active' : ''}`}
+              title="Where was my city in deep time? (Press C)"
+              aria-label="Pin a city to track its continental drift"
+            >
+              <MapPin size={14} />
+              <span>{selectedCity ? selectedCity.name : 'Where was my city?'}</span>
             </button>
           </div>
         </section>
@@ -1214,8 +1349,12 @@ export default function Home() {
                 <h3>540 million years of changing geography</h3>
                 <p>
                   109 elevation grids from Scotese & Wright (2018), generally at
-                  5-million-year intervals and 1° spatial resolution. Land,
-                  shallow seas and ocean depths derive from these grids.
+                  5-million-year intervals. The last 70 million years use the
+                  publisher’s finer 0.1° grids, sampled at 0.2° for display;
+                  earlier terrain uses 1° grids. Land, shallow seas and ocean
+                  depths derive from these grids. Finer sampling improves the
+                  display, not the certainty of ancient geography. Source file
+                  ages are nominal and individual geological estimates differ.
                   Interpolation blends reconstructed elevations; it is not a
                   continuous plate-motion solution. Colors are a terrain
                   treatment, not evidence of actual vegetation.
@@ -1250,13 +1389,23 @@ export default function Home() {
                 </p>
                 <h3>Ice ages and human migrations</h3>
                 <p>
-                  Shelf exposure uses a coarse modern elevation grid with an
+                  Shelf exposure uses the modern elevation grid with an
                   illustrative interpolation between published anchors: about
                   −120 m at 21,000 years, −75 m at 50,000 years and −85 m at
                   65,000 years ago. Ice regions are schematic. Routes show broad
                   dispersal connections, not a measured sequence; coastal
                   detail, ice barriers and competing hypotheses require
                   specialist regional maps.
+                </p>
+                <p>
+                  Earlier Pleistocene ice varies with the LR04 marine oxygen
+                  isotope record. This proxy combines ice-volume and deep-ocean
+                  temperature signals: its visual intensity is illustrative,
+                  not measured ice coverage or sea level. Approximate northern
+                  ice footprints cannot locate exact ancient margins. Early and
+                  mid-Holocene northern Africa shows a schematic steppe and
+                  savanna treatment, fading toward the later Sahara desert;
+                  this is not a map of exact vegetation or lakes.
                 </p>
                 <h3>Dates and uncertainty</h3>
                 <p>
@@ -1268,7 +1417,6 @@ export default function Home() {
                   temperature, oxygen or CO₂ series is implied.
                 </p>
                 <h3>Data credits</h3>
-                <p>Historical tectonic mode uses Cao et al. (2024) through the GPlates Web Service. Coastline outlines and boundary types share that model; positions are uncertain, especially in deep time. This diagram does not show reconstructed elevation or exact ancient shorelines. It loads the nearest million-year snapshot and requires a network connection.</p>
                 <p>
                   PALEOMAP PaleoDEMs: Scotese, C.R. & Wright, N. (2018), CC BY
                   4.0. Elevation encoding, rendering and interpolation adapted.
@@ -1282,6 +1430,9 @@ export default function Home() {
                     'earlyClimate',
                     'earlyWater',
                     'paleo',
+                    'paleoFine',
+                    'glacialProxy',
+                    'humidSahara',
                     'nasa',
                     'plates',
                     'tectonics',
@@ -1310,6 +1461,10 @@ export default function Home() {
                   body is focused. Ctrl/⌘ K opens search. Reduced-motion
                   preferences disable automatic globe rotation and ease effects.
                 </p>
+                <div className="atlas-credits">
+                  <div>Created by <strong>Bleon Balaj</strong></div>
+                  <div>Contact: <a href="mailto:b.balaj@hotmail.com">b.balaj@hotmail.com</a></div>
+                </div>
               </>
             )}
           </div>
@@ -1450,6 +1605,53 @@ export default function Home() {
           </p>
         </DialogContent>
       </Dialog>
+      <Dialog open={cityPicker} onOpenChange={setCityPicker}>
+        <DialogContent className="city-picker-dialog">
+          <DialogHeader>
+            <DialogTitle>Where was my city?</DialogTitle>
+            <DialogDescription>
+              Choose a city to track its tectonic continental drift across 540 million years of Earth's history.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="city-search-box">
+            <Search size={15} />
+            <input
+              type="text"
+              placeholder="Filter cities..."
+              value={citySearch}
+              onChange={(e) => setCitySearch(e.target.value)}
+            />
+          </div>
+          <div className="city-regions-list">
+            {paleoCities
+              .filter((c) =>
+                !citySearch ||
+                c.name.toLowerCase().includes(citySearch.toLowerCase()) ||
+                c.country.toLowerCase().includes(citySearch.toLowerCase()) ||
+                c.region.toLowerCase().includes(citySearch.toLowerCase())
+              )
+              .map((c) => (
+                <button
+                  key={c.id}
+                  className={`city-choice-card ${selectedCity?.id === c.id ? 'active' : ''}`}
+                  onClick={() => {
+                    setSelectedCity(c);
+                    setCityPicker(false);
+                    const loc = getPaleoCityLocation(c, age);
+                    api.current?.focus(loc.lat, loc.lon);
+                  }}
+                >
+                  <div className="city-choice-info">
+                    <strong>{c.name}</strong>
+                    <span>{c.country} · {c.craton}</span>
+                  </div>
+                  <ChevronRight size={15} />
+                </button>
+              ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={compare} onOpenChange={setCompare}>
         <DialogContent className="compare-dialog">
           <DialogHeader>

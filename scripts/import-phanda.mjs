@@ -1,0 +1,22 @@
+import fs from 'node:fs/promises';
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+const revision='9f06c0d9764f3da77cb0819e0ac87c01182ba341';
+const source=`https://raw.githubusercontent.com/EJJudd/PhanDA/${revision}/5_Outputs/PhanDA_GMSTandCO2_percentiles.csv`;
+const response=await fetch(source,{signal:AbortSignal.timeout(20000)});
+assert(response.ok,`Source returned ${response.status}`);
+const csv=await response.text();
+const [header,...lines]=csv.trim().split(/\r?\n/);
+const keys=header.split(',');
+const rows=lines.map(line=>{
+ const values=line.split(',');assert.equal(values.length,keys.length);
+ const record=Object.fromEntries(keys.map((k,i)=>[k,values[i]]));
+ const row={stage:record.Stage,younger:Number(record.UpperAge),older:Number(record.LowerAge),midpoint:Number(record.AverageAge),low:Number(record.GMST_05),median:Number(record.GMST_50),high:Number(record.GMST_95)};
+ assert(Object.values(row).every(v=>typeof v==='string'||Number.isFinite(v)));
+ assert(row.younger<row.older&&row.low<=row.median&&row.median<=row.high);
+ return row;
+});
+assert.equal(rows.length,85);
+for(let i=1;i<rows.length;i++)assert.equal(rows[i-1].older,rows[i].younger,'Noncontiguous source intervals');
+await fs.writeFile('lib/earth/phanda.json',JSON.stringify({citation:'Judd et al. (2024), Science, doi:10.1126/science.adk3705',source,revision,sha256:createHash('sha256').update(csv).digest('hex'),units:'degrees Celsius',uncertainty:'5th–95th percentiles of the reconstructed ensemble',rows},null,2)+'\n');
+console.log(`Imported ${rows.length} published interval estimates; no temporal interpolation or extrapolation`);

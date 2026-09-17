@@ -1,6 +1,9 @@
 export type Category = 'Planet'|'Life'|'Climate'|'Extinction'|'Humanity'|'Migration'|'Civilization';
 export type EarthEvent = {id:string;age:number;title:string;category:Category;date:string;description:string;importance:string;place:string;certainty:string;sources:string[];keywords?:string;location?:[number,number]};
 export const sources:Record<string,{name:string;url:string}>={
+ glacialProxy:{name:'Lisiecki & Raymo (2005) · LR04 glacial climate proxy',url:'https://lorraine-lisiecki.com/stack.html'},
+ humidSahara:{name:'NOAA NCEI · End of the African Humid Period',url:'https://www.ncei.noaa.gov/sites/default/files/2021-11/5%20End%20of%20the%20Africian%20Humid%20Period%20-Final_OCT%202021.pdf'},
+ paleoFine:{name:'Scotese & Wright · Finer PALEOMAP terrain grids',url:'https://zenodo.org/records/5460860'},
  bronzeTrade:{name:'The Met · Copper ingots and Late Bronze Age trade',url:'https://www.metmuseum.org/art/collection/search/248493'},
  ironHasanlu:{name:'The Met · Hasanlu in the Iron Age',url:'https://www.metmuseum.org/essays/hasanlu-in-the-iron-age'},
  bronzeChronology:{name:'British Museum · Regional Late Bronze Age chronologies',url:'https://www.britishmuseum.org/collection/term/x14146'},

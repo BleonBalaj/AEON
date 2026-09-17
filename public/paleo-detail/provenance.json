@@ -1,0 +1,86 @@
+{
+  "citation": "Scotese & Wright (2018), PALEOMAP PaleoDEMs",
+  "source": "https://zenodo.org/records/5460860",
+  "archive": "paleodem-01.zip",
+  "archiveSha256": "ab360184d8260a815ef5ed6b8b4e0abdbf99ef5ee8aa87dfd070af323ceb42da",
+  "sourceSpacingDegrees": 0.1,
+  "displaySpacingDegrees": 0.2,
+  "note": "Nominal source ages retained. Sampled published grids; no added terrain. Polar export spikes repaired from adjacent rows.",
+  "records": [
+    {
+      "age": 0.0,
+      "file": "Scotese_Wright_2018_Maps_1-88_6minX6min_PaleoDEMS_nc/Map01_PALEOMAP_6min_Holocene_0Ma.nc",
+      "description": "PALEOMAP:Holocene, 0.0 Ma"
+    },
+    {
+      "age": 5.0,
+      "file": "Scotese_Wright_2018_Maps_1-88_6minX6min_PaleoDEMS_nc/Map03_PALEOMAP_6min_Pliocene_5Ma.nc",
+      "description": "PALEOMAP:Pliocene, 4.0 Ma"
+    },
+    {
+      "age": 10.0,
+      "file": "Scotese_Wright_2018_Maps_1-88_6minX6min_PaleoDEMS_nc/Map05_PALEOMAP_6min_middle_Late_Miocene_10Ma.nc",
+      "description": "PALEOMAP:middle_Late_Miocene, 10.5 Ma"
+    },
+    {
+      "age": 15.0,
+      "file": "Scotese_Wright_2018_Maps_1-88_6minX6min_PaleoDEMS_nc/Map06_PALEOMAP_6min_Middle_Miocene_15Ma.nc",
+      "description": "PALEOMAP:Middle_Miocene, 14.9 Ma"
+    },
+    {
+      "age": 20.0,
+      "file": "Scotese_Wright_2018_Maps_1-88_6minX6min_PaleoDEMS_nc/Map07_PALEOMAP_6min_Early_Miocene_20Ma.nc",
+      "description": "PALEOMAP:Early_Miocene, 19.5 Ma"
+    },
+    {
+      "age": 25.0,
+      "file": "Scotese_Wright_2018_Maps_1-88_6minX6min_PaleoDEMS_nc/Map08_PALEOMAP_6min_Late_Oligocene_25Ma.nc",
+      "description": "PALEOMAP:Late_Oligocene, 25.6 Ma"
+    },
+    {
+      "age": 30.0,
+      "file": "Scotese_Wright_2018_Maps_1-88_6minX6min_PaleoDEMS_nc/Map09_PALEOMAP_6min_Early_Oligocene_30Ma.nc",
+      "description": "PALEOMAP:Early_Oligocene, 31 Ma"
+    },
+    {
+      "age": 35.0,
+      "file": "Scotese_Wright_2018_Maps_1-88_6minX6min_PaleoDEMS_nc/Map10_PALEOMAP_6min_Late_Eocene_35Ma.nc",
+      "description": "PALEOMAP:Late_Eocene, 35.9 Ma"
+    },
+    {
+      "age": 40.0,
+      "file": "Scotese_Wright_2018_Maps_1-88_6minX6min_PaleoDEMS_nc/Map11_PALEOMAP_6min_late_Middle_Eocene_40Ma.nc",
+      "description": "PALEOMAP:late_Middle_Eocene, 39.5 Ma"
+    },
+    {
+      "age": 45.0,
+      "file": "Scotese_Wright_2018_Maps_1-88_6minX6min_PaleoDEMS_nc/Map12_PALEOMAP_6min_early_Middle_Eocene_45Ma.nc",
+      "description": "PALEOMAP:early_Middle_Eocene, 44.5 Ma"
+    },
+    {
+      "age": 50.0,
+      "file": "Scotese_Wright_2018_Maps_1-88_6minX6min_PaleoDEMS_nc/Map13_PALEOMAP_6min_Early_Eocene_50Ma.nc",
+      "description": "PALEOMAP:Early_Eocene, 52.2 Ma"
+    },
+    {
+      "age": 55.0,
+      "file": "Scotese_Wright_2018_Maps_1-88_6minX6min_PaleoDEMS_nc/Map14_PALEOMAP_6min_Paleocene_Eocene_Boundary_55Ma.nc",
+      "description": "PALEOMAP:Paleocene_Eocene_Boundary, 55.8 Ma"
+    },
+    {
+      "age": 60.0,
+      "file": "Scotese_Wright_2018_Maps_1-88_6minX6min_PaleoDEMS_nc/Map15_PALEOMAP_6min_Paleocene_60Ma.nc",
+      "description": "PALEOMAP:Paleocene, 60.6 Ma"
+    },
+    {
+      "age": 65.0,
+      "file": "Scotese_Wright_2018_Maps_1-88_6minX6min_PaleoDEMS_nc/Map16_PALEOMAP_6min_KT_Boundary_65Ma.nc",
+      "description": "PALEOMAP:KT_Boundary, 66 Ma"
+    },
+    {
+      "age": 70.0,
+      "file": "Scotese_Wright_2018_Maps_1-88_6minX6min_PaleoDEMS_nc/Map17_PALEOMAP_6min_Late_Cretaceous_70Ma.nc",
+      "description": "PALEOMAP:Late_Cretaceous, 69 Ma"
+    }
+  ]
+}

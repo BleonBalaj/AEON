@@ -1,0 +1,775 @@
+{
+  "citation": "Judd et al. (2024), Science, doi:10.1126/science.adk3705",
+  "source": "https://raw.githubusercontent.com/EJJudd/PhanDA/9f06c0d9764f3da77cb0819e0ac87c01182ba341/5_Outputs/PhanDA_GMSTandCO2_percentiles.csv",
+  "revision": "9f06c0d9764f3da77cb0819e0ac87c01182ba341",
+  "sha256": "22cad7964bac3b679ad83bf8a9c83eb66e995898a01eb9e93142087b2d4f6e1f",
+  "units": "degrees Celsius",
+  "uncertainty": "5th–95th percentiles of the reconstructed ensemble",
+  "rows": [
+    {
+      "stage": "Holocene",
+      "younger": 0,
+      "older": 0.0117,
+      "midpoint": 0.00585,
+      "low": 12.9719647274712,
+      "median": 13.9931819745315,
+      "high": 14.543009664622
+    },
+    {
+      "stage": "Upper Pleistocene",
+      "younger": 0.0117,
+      "older": 0.129,
+      "midpoint": 0.07035,
+      "low": 10.5227783619766,
+      "median": 11.4427075570232,
+      "high": 12.5578430944063
+    },
+    {
+      "stage": "Chibanian",
+      "younger": 0.129,
+      "older": 0.774,
+      "midpoint": 0.4515,
+      "low": 10.6320392427106,
+      "median": 11.7947277223884,
+      "high": 13.2093028389652
+    },
+    {
+      "stage": "Calabrian",
+      "younger": 0.774,
+      "older": 1.8,
+      "midpoint": 1.287,
+      "low": 11.8194771212201,
+      "median": 12.8210404781077,
+      "high": 14.0000495766004
+    },
+    {
+      "stage": "Gelasian",
+      "younger": 1.8,
+      "older": 2.58,
+      "midpoint": 2.19,
+      "low": 12.9407104446859,
+      "median": 14.2140645841823,
+      "high": 15.9510201333274
+    },
+    {
+      "stage": "Piacenzian",
+      "younger": 2.58,
+      "older": 3.6,
+      "midpoint": 3.09,
+      "low": 14.4385923948389,
+      "median": 15.6324894532157,
+      "high": 17.8785096784604
+    },
+    {
+      "stage": "Zanclean",
+      "younger": 3.6,
+      "older": 5.33,
+      "midpoint": 4.465,
+      "low": 14.969849428743,
+      "median": 16.2660268297824,
+      "high": 18.0195278500211
+    },
+    {
+      "stage": "Messinian",
+      "younger": 5.33,
+      "older": 7.25,
+      "midpoint": 6.29,
+      "low": 15.7498756831131,
+      "median": 16.9371654477615,
+      "high": 18.2549120670749
+    },
+    {
+      "stage": "Tortonian",
+      "younger": 7.25,
+      "older": 11.63,
+      "midpoint": 9.44,
+      "low": 19.1823658524228,
+      "median": 20.6171077317341,
+      "high": 21.9718043608294
+    },
+    {
+      "stage": "Serravallian",
+      "younger": 11.63,
+      "older": 13.82,
+      "midpoint": 12.725,
+      "low": 21.3154105736663,
+      "median": 23.5980015479747,
+      "high": 25.44228148338
+    },
+    {
+      "stage": "Langhian",
+      "younger": 13.82,
+      "older": 15.99,
+      "midpoint": 14.905,
+      "low": 20.7155873105054,
+      "median": 23.7771028693439,
+      "high": 26.7746057707245
+    },
+    {
+      "stage": "Burdigalian",
+      "younger": 15.99,
+      "older": 20.45,
+      "midpoint": 18.22,
+      "low": 21.3912225449915,
+      "median": 24.0593310639449,
+      "high": 26.3023368866387
+    },
+    {
+      "stage": "Aquitanian",
+      "younger": 20.45,
+      "older": 23.04,
+      "midpoint": 21.745,
+      "low": 19.7478429732851,
+      "median": 22.0654995818862,
+      "high": 24.8939674228983
+    },
+    {
+      "stage": "Chattian",
+      "younger": 23.04,
+      "older": 27.29,
+      "midpoint": 25.165,
+      "low": 21.694113043577,
+      "median": 23.4350027681677,
+      "high": 24.7668548801231
+    },
+    {
+      "stage": "Rupelian",
+      "younger": 27.29,
+      "older": 33.9,
+      "midpoint": 30.595,
+      "low": 21.0518839040473,
+      "median": 23.3955073376117,
+      "high": 25.0862904431289
+    },
+    {
+      "stage": "Priabonian",
+      "younger": 33.9,
+      "older": 37.71,
+      "midpoint": 35.805,
+      "low": 24.6514287575016,
+      "median": 26.0771268093401,
+      "high": 27.8910799165432
+    },
+    {
+      "stage": "Bartonian",
+      "younger": 37.71,
+      "older": 41.03,
+      "midpoint": 39.37,
+      "low": 26.0968467982109,
+      "median": 28.0262595890717,
+      "high": 30.2544074642656
+    },
+    {
+      "stage": "Lutetian",
+      "younger": 41.03,
+      "older": 48.07,
+      "midpoint": 44.55,
+      "low": 24.5748165083121,
+      "median": 26.9857638243254,
+      "high": 32.6091500988539
+    },
+    {
+      "stage": "Ypresian",
+      "younger": 48.07,
+      "older": 55.7,
+      "midpoint": 52.035,
+      "low": 29.7321577442027,
+      "median": 32.2821104266548,
+      "high": 37.2694005725934
+    },
+    {
+      "stage": "PETM",
+      "younger": 55.7,
+      "older": 56,
+      "midpoint": 55.85,
+      "low": 30.286689057205,
+      "median": 33.5864799830074,
+      "high": 39.1679902272263
+    },
+    {
+      "stage": "Thanetian",
+      "younger": 56,
+      "older": 59.24,
+      "midpoint": 57.62,
+      "low": 24.5742502568133,
+      "median": 25.6033526215586,
+      "high": 28.1658593515276
+    },
+    {
+      "stage": "Selandian/Danian",
+      "younger": 59.24,
+      "older": 66,
+      "midpoint": 62.62,
+      "low": 25.4292645045374,
+      "median": 28.8460776476132,
+      "high": 31.8740198348031
+    },
+    {
+      "stage": "Maastrichtian",
+      "younger": 66,
+      "older": 72.17,
+      "midpoint": 69.085,
+      "low": 21.5668324561245,
+      "median": 24.5068077268145,
+      "high": 26.8057511182632
+    },
+    {
+      "stage": "Campanian",
+      "younger": 72.17,
+      "older": 83.65,
+      "midpoint": 77.91,
+      "low": 24.3864441621944,
+      "median": 28.1349272518328,
+      "high": 31.0587927094666
+    },
+    {
+      "stage": "Santonian",
+      "younger": 83.65,
+      "older": 85.7,
+      "midpoint": 84.675,
+      "low": 28.3475846022197,
+      "median": 31.4192600767422,
+      "high": 38.5041672225419
+    },
+    {
+      "stage": "Coniacian",
+      "younger": 85.7,
+      "older": 89.39,
+      "midpoint": 87.545,
+      "low": 29.8526308727077,
+      "median": 32.2555152424552,
+      "high": 40.8165186095151
+    },
+    {
+      "stage": "Turonian",
+      "younger": 89.39,
+      "older": 93.9,
+      "midpoint": 91.645,
+      "low": 31.1116042205019,
+      "median": 35.5644121232914,
+      "high": 43.7290631520248
+    },
+    {
+      "stage": "Cenomanian",
+      "younger": 93.9,
+      "older": 100.5,
+      "midpoint": 97.2,
+      "low": 28.4502795359765,
+      "median": 34.1359578248804,
+      "high": 40.220855787922
+    },
+    {
+      "stage": "Albian",
+      "younger": 100.5,
+      "older": 113.2,
+      "midpoint": 106.85,
+      "low": 23.0119362293657,
+      "median": 26.0115083296659,
+      "high": 31.048514187044
+    },
+    {
+      "stage": "Aptian",
+      "younger": 113.2,
+      "older": 121.4,
+      "midpoint": 117.3,
+      "low": 24.389848587773,
+      "median": 32.0025039577799,
+      "high": 37.541558066846
+    },
+    {
+      "stage": "Barremian",
+      "younger": 121.4,
+      "older": 126.5,
+      "midpoint": 123.95,
+      "low": 22.9274190114728,
+      "median": 30.5155350663859,
+      "high": 34.9544920333413
+    },
+    {
+      "stage": "Hauterivian",
+      "younger": 126.5,
+      "older": 132.6,
+      "midpoint": 129.55,
+      "low": 20.8410430222392,
+      "median": 27.2744408860988,
+      "high": 31.345381659959
+    },
+    {
+      "stage": "Valanginian",
+      "younger": 132.6,
+      "older": 137.7,
+      "midpoint": 135.15,
+      "low": 22.4774008020106,
+      "median": 28.2458879572826,
+      "high": 37.725261742297
+    },
+    {
+      "stage": "Berriasian",
+      "younger": 137.7,
+      "older": 143.1,
+      "midpoint": 140.4,
+      "low": 21.2669358471645,
+      "median": 27.0009247295016,
+      "high": 35.2026236805896
+    },
+    {
+      "stage": "Tithonian",
+      "younger": 143.1,
+      "older": 149.24,
+      "midpoint": 146.17,
+      "low": 23.7302507186534,
+      "median": 27.2664188903499,
+      "high": 31.3541713748046
+    },
+    {
+      "stage": "Kimmeridgian",
+      "younger": 149.24,
+      "older": 154.78,
+      "midpoint": 152.01,
+      "low": 21.1801677012507,
+      "median": 24.4651398497498,
+      "high": 29.6258551395484
+    },
+    {
+      "stage": "Oxfordian",
+      "younger": 154.78,
+      "older": 161.53,
+      "midpoint": 158.155,
+      "low": 21.3838303066822,
+      "median": 23.8791170307549,
+      "high": 30.1355251187081
+    },
+    {
+      "stage": "Callovian",
+      "younger": 161.53,
+      "older": 165.29,
+      "midpoint": 163.41,
+      "low": 16.974522170102,
+      "median": 20.1145628110959,
+      "high": 24.399674914738
+    },
+    {
+      "stage": "Bathonian",
+      "younger": 165.29,
+      "older": 168.17,
+      "midpoint": 166.73,
+      "low": 11.1001130122243,
+      "median": 17.7747181126215,
+      "high": 20.6764926724101
+    },
+    {
+      "stage": "Bajocian",
+      "younger": 168.17,
+      "older": 170.9,
+      "midpoint": 169.535,
+      "low": 14.3700515086335,
+      "median": 21.3948194597495,
+      "high": 23.9134598452442
+    },
+    {
+      "stage": "Aalenian",
+      "younger": 170.9,
+      "older": 174.7,
+      "midpoint": 172.8,
+      "low": 16.2604481338206,
+      "median": 23.1957686423381,
+      "high": 28.8044492117906
+    },
+    {
+      "stage": "Toarcian",
+      "younger": 174.7,
+      "older": 184.2,
+      "midpoint": 179.45,
+      "low": 23.1675691618204,
+      "median": 26.3711989187389,
+      "high": 29.6264239162354
+    },
+    {
+      "stage": "Pliensbachian",
+      "younger": 184.2,
+      "older": 192.9,
+      "midpoint": 188.55,
+      "low": 20.8586759368424,
+      "median": 24.1045697532695,
+      "high": 30.7583574110906
+    },
+    {
+      "stage": "Sinemurian/Hettangian",
+      "younger": 192.9,
+      "older": 201.36,
+      "midpoint": 197.13,
+      "low": 21.1736480460573,
+      "median": 25.0557075326596,
+      "high": 30.4200464032064
+    },
+    {
+      "stage": "Rhaetian",
+      "younger": 201.36,
+      "older": 205.74,
+      "midpoint": 203.55,
+      "low": 18.5103631021901,
+      "median": 22.3177277790797,
+      "high": 25.7680680350302
+    },
+    {
+      "stage": "Norian",
+      "younger": 205.74,
+      "older": 227.3,
+      "midpoint": 216.52,
+      "low": 21.0403564779245,
+      "median": 25.0210350893564,
+      "high": 28.6780633188448
+    },
+    {
+      "stage": "Carnian",
+      "younger": 227.3,
+      "older": 237,
+      "midpoint": 232.15,
+      "low": 18.0805617532787,
+      "median": 23.4281859118996,
+      "high": 29.4746974658182
+    },
+    {
+      "stage": "Ladinian",
+      "younger": 237,
+      "older": 241.46,
+      "midpoint": 239.23,
+      "low": 9.29212400000762,
+      "median": 19.1790298416314,
+      "high": 24.7071968909102
+    },
+    {
+      "stage": "Anisian/Olenekian",
+      "younger": 241.46,
+      "older": 249.88,
+      "midpoint": 245.67,
+      "low": 20.1448972652652,
+      "median": 25.8246756955787,
+      "high": 32.6167553254379
+    },
+    {
+      "stage": "Induan",
+      "younger": 249.88,
+      "older": 251.9,
+      "midpoint": 250.89,
+      "low": 24.3464119813878,
+      "median": 28.4989203320791,
+      "high": 32.0610721380721
+    },
+    {
+      "stage": "Changhsingian",
+      "younger": 251.9,
+      "older": 254.24,
+      "midpoint": 253.07,
+      "low": 14.2895785602182,
+      "median": 18.0194011085218,
+      "high": 20.6995712187052
+    },
+    {
+      "stage": "Wuchiapingian",
+      "younger": 254.24,
+      "older": 259.55,
+      "midpoint": 256.895,
+      "low": 19.1420808730492,
+      "median": 22.1920115915007,
+      "high": 24.6138049706385
+    },
+    {
+      "stage": "Capitanian/Wordian",
+      "younger": 259.55,
+      "older": 269.21,
+      "midpoint": 264.38,
+      "low": 14.3045635692391,
+      "median": 18.6812393483702,
+      "high": 22.0618708589371
+    },
+    {
+      "stage": "Roadian",
+      "younger": 269.21,
+      "older": 274.37,
+      "midpoint": 271.79,
+      "low": 8.76863003232756,
+      "median": 13.5035131431753,
+      "high": 18.2858220382269
+    },
+    {
+      "stage": "Kungurian",
+      "younger": 274.37,
+      "older": 283.3,
+      "midpoint": 278.835,
+      "low": 15.0771890215388,
+      "median": 18.6979375488031,
+      "high": 24.3907020314695
+    },
+    {
+      "stage": "Artinskian",
+      "younger": 283.3,
+      "older": 290.51,
+      "midpoint": 286.905,
+      "low": 15.561082106011,
+      "median": 20.7605804172937,
+      "high": 24.2200938589703
+    },
+    {
+      "stage": "Sakmarian",
+      "younger": 290.51,
+      "older": 293.52,
+      "midpoint": 292.015,
+      "low": 12.5758438789459,
+      "median": 20.7998383208878,
+      "high": 26.1030775465358
+    },
+    {
+      "stage": "Asselian",
+      "younger": 293.52,
+      "older": 298.89,
+      "midpoint": 296.205,
+      "low": 15.2008994711743,
+      "median": 20.246530717921,
+      "high": 27.3910724601633
+    },
+    {
+      "stage": "Gzhelian",
+      "younger": 298.89,
+      "older": 303.68,
+      "midpoint": 301.285,
+      "low": 14.2693157792763,
+      "median": 16.5457003488786,
+      "high": 19.6091246818926
+    },
+    {
+      "stage": "Kasimovian",
+      "younger": 303.68,
+      "older": 307.02,
+      "midpoint": 305.35,
+      "low": 11.3164004556692,
+      "median": 14.4595519577255,
+      "high": 18.2872422068323
+    },
+    {
+      "stage": "Moscovian",
+      "younger": 307.02,
+      "older": 315.15,
+      "midpoint": 311.085,
+      "low": 14.9952767708379,
+      "median": 18.0930682798576,
+      "high": 22.6250529351131
+    },
+    {
+      "stage": "Bashkirian",
+      "younger": 315.15,
+      "older": 323.4,
+      "midpoint": 319.275,
+      "low": 10.5795717940369,
+      "median": 14.0831809426726,
+      "high": 20.5573607302133
+    },
+    {
+      "stage": "Serpukhovian",
+      "younger": 323.4,
+      "older": 330.34,
+      "midpoint": 326.87,
+      "low": 9.01936444442834,
+      "median": 12.0196117042152,
+      "high": 15.6839859645463
+    },
+    {
+      "stage": "Visean",
+      "younger": 330.34,
+      "older": 346.73,
+      "midpoint": 338.535,
+      "low": 7.4411080355713,
+      "median": 12.8255656851551,
+      "high": 17.3135399122572
+    },
+    {
+      "stage": "Tournaisian",
+      "younger": 346.73,
+      "older": 359.3,
+      "midpoint": 353.015,
+      "low": 18.9332174979994,
+      "median": 21.7511645841093,
+      "high": 24.7612211789612
+    },
+    {
+      "stage": "Famennian",
+      "younger": 359.3,
+      "older": 371.1,
+      "midpoint": 365.2,
+      "low": 20.0494062727614,
+      "median": 23.758832514672,
+      "high": 27.5181155452974
+    },
+    {
+      "stage": "Frasnian",
+      "younger": 371.1,
+      "older": 378.9,
+      "midpoint": 375,
+      "low": 23.5838627730318,
+      "median": 27.9070754159621,
+      "high": 31.5825579359055
+    },
+    {
+      "stage": "Givetian",
+      "younger": 378.9,
+      "older": 385.3,
+      "midpoint": 382.1,
+      "low": 21.5234092335677,
+      "median": 25.6749278741602,
+      "high": 29.9563944289755
+    },
+    {
+      "stage": "Eifelian",
+      "younger": 385.3,
+      "older": 394.3,
+      "midpoint": 389.8,
+      "low": 18.8079950247474,
+      "median": 22.4890564687753,
+      "high": 26.8685392041214
+    },
+    {
+      "stage": "Emsian",
+      "younger": 394.3,
+      "older": 410.5,
+      "midpoint": 402.4,
+      "low": 21.7543783768427,
+      "median": 25.2949084946877,
+      "high": 29.1262510391329
+    },
+    {
+      "stage": "Pragian/Lochkovian",
+      "younger": 410.5,
+      "older": 419,
+      "midpoint": 414.75,
+      "low": 23.4457033576388,
+      "median": 28.814095554512,
+      "high": 33.2103902139423
+    },
+    {
+      "stage": "Pridoli",
+      "younger": 419,
+      "older": 422.73,
+      "midpoint": 420.865,
+      "low": 25.5096657145078,
+      "median": 33.2475587574524,
+      "high": 38.6372112294075
+    },
+    {
+      "stage": "Ludfordian",
+      "younger": 422.73,
+      "older": 425.01,
+      "midpoint": 423.87,
+      "low": 28.2332574132677,
+      "median": 34.0485438455218,
+      "high": 38.1737848395804
+    },
+    {
+      "stage": "Gorstian",
+      "younger": 425.01,
+      "older": 426.74,
+      "midpoint": 425.875,
+      "low": 18.7688985104995,
+      "median": 25.5952068415279,
+      "high": 32.9201315014484
+    },
+    {
+      "stage": "Homerian",
+      "younger": 426.74,
+      "older": 430.62,
+      "midpoint": 428.68,
+      "low": 15.046997346172,
+      "median": 20.9676288815397,
+      "high": 26.7243304187807
+    },
+    {
+      "stage": "Sheinwoodian",
+      "younger": 430.62,
+      "older": 432.93,
+      "midpoint": 431.775,
+      "low": 13.611032497644,
+      "median": 19.8963512329883,
+      "high": 25.9049295400452
+    },
+    {
+      "stage": "Telychian",
+      "younger": 432.93,
+      "older": 438.59,
+      "midpoint": 435.76,
+      "low": 17.6583743949823,
+      "median": 24.3616345008342,
+      "high": 30.7917704532152
+    },
+    {
+      "stage": "Aeronian/Rhuddanian",
+      "younger": 438.59,
+      "older": 443.07,
+      "midpoint": 440.83,
+      "low": 12.9515682790124,
+      "median": 19.4780156455434,
+      "high": 24.4205129480669
+    },
+    {
+      "stage": "Hirnantian",
+      "younger": 443.07,
+      "older": 445.21,
+      "midpoint": 444.14,
+      "low": 14.7611315164506,
+      "median": 20.8024203560631,
+      "high": 27.1711592199701
+    },
+    {
+      "stage": "Katian",
+      "younger": 445.21,
+      "older": 452.75,
+      "midpoint": 448.98,
+      "low": 22.9774742033469,
+      "median": 27.8478382779941,
+      "high": 32.7822239287343
+    },
+    {
+      "stage": "Sandbian",
+      "younger": 452.75,
+      "older": 458.18,
+      "midpoint": 455.465,
+      "low": 22.4345010158476,
+      "median": 27.3132582736291,
+      "high": 32.9283688579153
+    },
+    {
+      "stage": "Darriwilian",
+      "younger": 458.18,
+      "older": 469.42,
+      "midpoint": 463.8,
+      "low": 24.6316297423936,
+      "median": 31.0028614951656,
+      "high": 35.8599381460267
+    },
+    {
+      "stage": "Dapingian",
+      "younger": 469.42,
+      "older": 471.26,
+      "midpoint": 470.34,
+      "low": 23.2840285277871,
+      "median": 30.9044514401457,
+      "high": 35.9301732951005
+    },
+    {
+      "stage": "Floian",
+      "younger": 471.26,
+      "older": 477.08,
+      "midpoint": 474.17,
+      "low": 23.251079950348,
+      "median": 31.5273748344447,
+      "high": 39.2501381519957
+    },
+    {
+      "stage": "Tremadocian",
+      "younger": 477.08,
+      "older": 486.85,
+      "midpoint": 481.965,
+      "low": 22.5686634499389,
+      "median": 32.1026884647245,
+      "high": 36.8641605679442
+    }
+  ]
+}
