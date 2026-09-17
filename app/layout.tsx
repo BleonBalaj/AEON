@@ -19,10 +19,7 @@ export const metadata: Metadata = {
   description:
     'Explore 4.54 billion years of Earth with an interactive globe, geological history and human migration.',
   icons: {
-    icon: [
-      { url: `${assetPrefix}/favicon.svg`, type: 'image/svg+xml' },
-      { url: `${assetPrefix}/favicon.ico`, sizes: 'any' },
-    ],
+    icon: [{ url: `${assetPrefix}/icon.svg?v=2`, type: 'image/svg+xml' }],
     apple: `${assetPrefix}/apple-touch-icon.png`,
   },
 };
@@ -35,8 +32,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <head>
-        <link rel="icon" type="image/svg+xml" href={`${assetPrefix}/favicon.svg`} />
-        <link rel="alternate icon" href={`${assetPrefix}/favicon.ico`} />
+        <link rel="icon" type="image/svg+xml" href={`${assetPrefix}/icon.svg?v=2`} />
         <link rel="apple-touch-icon" href={`${assetPrefix}/apple-touch-icon.png`} />
       </head>
       <body
