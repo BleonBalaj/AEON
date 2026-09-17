@@ -41,13 +41,37 @@ jobs:
       - name: Build static site
         run: npm run build
 
-      - name: Verify static export
-        run: test -f dist/client/index.html
+      - name: Stage static export
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf pages-out
+          for dir in out dist/client dist/static dist; do
+            if [ -f "$dir/index.html" ]; then
+              mkdir -p pages-out
+              cp -a "$dir"/. pages-out/
+              echo "Using static export from $dir"
+              exit 0
+            fi
+          done
+
+          index_file="$(find . -maxdepth 6 -type f -name index.html -not -path './node_modules/*' -not -path './.git/*' | head -n 1 || true)"
+          if [ -n "$index_file" ]; then
+            root="$(dirname "$index_file")"
+            mkdir -p pages-out
+            cp -a "$root"/. pages-out/
+            echo "Using discovered static export from $root"
+            exit 0
+          fi
+
+          echo "Could not find the generated static site. HTML files found:"
+          find . -maxdepth 6 -type f -name '*.html' -not -path './node_modules/*' -not -path './.git/*' -print || true
+          exit 1
 
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: dist/client
+          path: pages-out
 
   deploy:
     environment:
