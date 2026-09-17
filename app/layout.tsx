@@ -12,16 +12,18 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 });
 
+const assetPrefix = process.env.GITHUB_PAGES === 'true' ? '/AEON' : '';
+
 export const metadata: Metadata = {
   title: 'AEON — A living history of Earth',
   description:
     'Explore 4.54 billion years of Earth with an interactive globe, geological history and human migration.',
   icons: {
     icon: [
-      { url: '/favicon.svg', type: 'image/svg+xml' },
-      { url: '/favicon.ico', sizes: 'any' },
+      { url: `${assetPrefix}/favicon.svg`, type: 'image/svg+xml' },
+      { url: `${assetPrefix}/favicon.ico`, sizes: 'any' },
     ],
-    apple: '/apple-touch-icon.png',
+    apple: `${assetPrefix}/apple-touch-icon.png`,
   },
 };
 
@@ -33,9 +35,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <head>
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <link rel="alternate icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="icon" type="image/svg+xml" href={`${assetPrefix}/favicon.svg`} />
+        <link rel="alternate icon" href={`${assetPrefix}/favicon.ico`} />
+        <link rel="apple-touch-icon" href={`${assetPrefix}/apple-touch-icon.png`} />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
@@ -45,4 +47,3 @@ export default function RootLayout({
     </html>
   );
 }
-
