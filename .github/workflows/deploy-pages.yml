@@ -50,9 +50,9 @@ jobs:
           rm -rf pages-out
           if [ -f dist/client/AEON/index.html ]; then
             mkdir -p pages-out
-            cp -a dist/client/. pages-out/
+            cp -a dist/client/AEON/. pages-out/
             touch pages-out/.nojekyll
-            echo "Staged AEON static export"
+            echo "Staged AEON static export at Pages root"
           else
             echo "AEON static export was not generated. HTML files found:"
             find dist -type f -name '*.html' -print || true
