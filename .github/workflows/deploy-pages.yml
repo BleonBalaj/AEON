@@ -35,7 +35,7 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          npm install --no-save vinext@1.0.0-beta.9
+          npm install --no-save --legacy-peer-deps vinext@1.0.0-beta.9 @vitejs/plugin-rsc@0.5.34
 
       - name: Prepare project-path assets
         run: node scripts/prepare-github-pages.mjs
