@@ -48,12 +48,13 @@ jobs:
         run: |
           set -euo pipefail
           rm -rf pages-out
-          if [ -f dist/client/index.html ]; then
+          if [ -f dist/client/AEON/index.html ]; then
             mkdir -p pages-out
             cp -a dist/client/. pages-out/
-            echo "Using static export from dist/client"
+            touch pages-out/.nojekyll
+            echo "Staged AEON static export"
           else
-            echo "Static export root was not generated. HTML files found:"
+            echo "AEON static export was not generated. HTML files found:"
             find dist -type f -name '*.html' -print || true
             exit 1
           fi
