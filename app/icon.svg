@@ -1,35 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <defs>
-    <radialGradient id="bg" cx="40%" cy="32%" r="78%">
-      <stop offset="0" stop-color="#17313a"/>
-      <stop offset="0.52" stop-color="#081217"/>
-      <stop offset="1" stop-color="#03080c"/>
-    </radialGradient>
-    <radialGradient id="core" cx="36%" cy="30%" r="72%">
-      <stop offset="0" stop-color="#eef7e8"/>
-      <stop offset="0.28" stop-color="#c8e0d0"/>
-      <stop offset="0.68" stop-color="#88b8b4"/>
-      <stop offset="1" stop-color="#315f69"/>
-    </radialGradient>
-    <linearGradient id="orbit" x1="8" y1="10" x2="56" y2="54" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#e5ddbd"/>
-      <stop offset="0.34" stop-color="#c9d9c4"/>
-      <stop offset="0.72" stop-color="#7fc7ce"/>
-      <stop offset="1" stop-color="#456f79"/>
-    </linearGradient>
-    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
-      <feGaussianBlur stdDeviation="1.35" result="b"/>
-      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-  </defs>
-  <rect x="2" y="2" width="60" height="60" rx="17" fill="url(#bg)" stroke="#b8d8d21f"/>
-  <circle cx="32" cy="32" r="8.2" fill="url(#core)"/>
-  <circle cx="32" cy="32" r="9.3" fill="none" stroke="#d8eadc2b" stroke-width="1"/>
-  <g fill="none" stroke="url(#orbit)" stroke-width="2.15" stroke-linecap="round" filter="url(#glow)">
-    <ellipse cx="32" cy="32" rx="23.5" ry="9.2" transform="rotate(-24 32 32)"/>
-    <ellipse cx="32" cy="32" rx="23.5" ry="9.2" transform="rotate(96 32 32)" opacity="0.88"/>
-  </g>
-  <circle cx="50.2" cy="19.1" r="3.05" fill="#e1d39d"/>
-  <circle cx="50.2" cy="19.1" r="1.2" fill="#fff8dc"/>
-  <circle cx="14.7" cy="44.9" r="1.65" fill="#9ed8d3" opacity="0.9"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#c8ddc6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M20.341 6.484A10 10 0 0 1 10.266 21.85"/>
+  <path d="M3.659 17.516A10 10 0 0 1 13.74 2.152"/>
+  <circle cx="12" cy="12" r="3"/>
+  <circle cx="19" cy="5" r="2"/>
+  <circle cx="5" cy="19" r="2"/>
 </svg>
