@@ -88,6 +88,18 @@ export default function HumanOdyssey() {
   const [status, setStatus] = useState('');
   const [atlasOpen, setAtlasOpen] = useState(false);
   const [atlasEvent, setAtlasEvent] = useState<EarthEvent | null>(null);
+  const [expandingFromSolar, setExpandingFromSolar] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (sessionStorage.getItem('aeon_last_nav') === 'solar') {
+        setExpandingFromSolar(true);
+        const t = setTimeout(() => setExpandingFromSolar(false), 900);
+        return () => clearTimeout(t);
+      }
+      sessionStorage.setItem('aeon_last_nav', 'odyssey');
+    }
+  }, []);
 
   const api = useRef<GlobeApi | null>(null);
   const chapter = chapters[index];
@@ -232,11 +244,6 @@ export default function HumanOdyssey() {
             <Orbit size={30} />
             <span>AEON</span>
           </Link>
-          <span className="brand-note">
-            A LIVING HISTORY
-            <br />
-            OF EARTH
-          </span>
           <nav aria-label="Main navigation">
             <Link href="/">
               <Globe2 size={15} />
@@ -245,6 +252,10 @@ export default function HumanOdyssey() {
             <Link href="/human-odyssey" className="active" aria-current="page">
               <Users size={15} />
               Human Odyssey
+            </Link>
+            <Link href="/solar-system">
+              <Compass size={15} />
+              Solar System
             </Link>
             <button onClick={() => { setPlaying(false); setAtlasOpen(true); }}>
               <Clock3 size={15} />
@@ -537,7 +548,7 @@ export default function HumanOdyssey() {
         </section>
 
         <section
-          className="time-panel"
+          className={`time-panel ${expandingFromSolar ? 'glass-morph-expand' : ''}`}
           id="time-control"
           data-playing={playing}
           aria-label="Human Odyssey playback controls"

@@ -196,6 +196,17 @@ export default function Home() {
     [compare, setCompare] = useState(false),
     [savedAge, setSavedAge] = useState<number | null>(null),
     [full, setFull] = useState(false);
+  const [expandingFromSolar, setExpandingFromSolar] = useState(false);
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (sessionStorage.getItem('aeon_last_nav') === 'solar') {
+        setExpandingFromSolar(true);
+        const t = setTimeout(() => setExpandingFromSolar(false), 900);
+        return () => clearTimeout(t);
+      }
+      sessionStorage.setItem('aeon_last_nav', 'earth');
+    }
+  }, []);
   const pinnedCityLocation = selectedCity ? getPaleoCityLocation(selectedCity, age) : null;
   const buffering = useRef(false);
   const onBuffering = useCallback((waiting: boolean) => {
@@ -470,11 +481,6 @@ export default function Home() {
             <Orbit size={30} />
             <span>AEON</span>
           </Link>
-          <span className="brand-note">
-            A LIVING HISTORY
-            <br />
-            OF EARTH
-          </span>
           <nav aria-label="Main navigation">
             <button className="active" onClick={() => setDrawer(null)}>
               <Globe2 size={15} />
@@ -483,6 +489,10 @@ export default function Home() {
             <Link href="/human-odyssey">
               <Users size={15} />
               Human Odyssey
+            </Link>
+            <Link href="/solar-system">
+              <Compass size={15} />
+              Solar System
             </Link>
             <button onClick={() => setDrawer('eras')}>
               <Clock3 size={15} />
@@ -859,7 +869,7 @@ export default function Home() {
           </div>
         </section>
         <section
-          className="time-panel"
+          className={`time-panel ${expandingFromSolar ? 'glass-morph-expand' : ''}`}
           id="time-control"
           data-playing={playing}
           aria-label="Time travel controls"

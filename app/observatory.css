@@ -266,3 +266,270 @@
 
 
 .atlas .time-panel .eon-strip button.active{color:#f5f8ea;border-top-color:#e4e6d2;background:linear-gradient(180deg,#d3c4a218,transparent);box-shadow:inset 0 1px 0 #edd9b533}
+
+/* Solar System Observatory Viewport & Layout: Spans entire screen, positioned behind observatory */
+.atlas.solar-page {
+  overflow: hidden;
+}
+
+.atlas.solar-page .chamber {
+  background: transparent !important;
+  pointer-events: none !important;
+}
+
+/* 3D Solar System Canvas: Spans 100% of the screen edge-to-edge behind the chamber */
+.atlas.solar-page .chamber .globe-host {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 0 !important;
+  mask-image: none !important;
+  -webkit-mask-image: none !important;
+  pointer-events: auto !important;
+}
+
+/* Observatory chamber architectural frame sits in front of the 3D canvas (z-index: 1) with transparent panoramic window */
+.atlas.solar-page .chamber:before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('/art/observatory-chamber-transparent.png') center/100% 100% no-repeat !important;
+  filter: saturate(.3) brightness(.62);
+  z-index: 1 !important;
+  pointer-events: none !important;
+  mix-blend-mode: normal !important;
+}
+
+/* Remove dark vignette & Earth globe ring so solar system starfield & orbits shine completely */
+.atlas.solar-page .chamber:after {
+  display: none !important;
+}
+
+.atlas.solar-page .chamber > .workspace:before {
+  display: none !important;
+}
+
+.atlas.solar-page .chamber > .workspace {
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+  position: relative;
+  pointer-events: none !important;
+}
+
+/* All interactive UI overlays sit on top of chamber with pointer-events enabled */
+.atlas.solar-page .chamber > .topbar {
+  position: relative;
+  z-index: 10 !important;
+  pointer-events: auto !important;
+}
+
+.atlas.solar-page .chamber .intro,
+.atlas.exploring.solar-page .chamber .intro {
+  left: 2.5%;
+  top: 7%;
+  width: 28%;
+  max-width: 330px;
+  z-index: 10 !important;
+  pointer-events: none;
+}
+
+.atlas.solar-page .chamber .intro button,
+.atlas.solar-page .chamber .intro .text-link,
+.atlas.solar-page .chamber .intro a {
+  pointer-events: auto !important;
+}
+
+.atlas.solar-page .chamber .context {
+  right: 2%;
+  top: 7%;
+  width: 220px;
+  z-index: 10 !important;
+  pointer-events: auto !important;
+}
+
+.atlas.solar-page .chamber .globe-caption {
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10 !important;
+  pointer-events: none;
+}
+
+.atlas.solar-page .chamber .view-toolbar {
+  right: 240px;
+  bottom: 22px;
+  z-index: 10 !important;
+  pointer-events: auto !important;
+}
+
+.atlas.solar-page .chamber > .time-panel {
+  position: relative;
+  z-index: 10 !important;
+  pointer-events: auto !important;
+}
+
+@media(max-width: 1000px) {
+  .atlas.solar-page .chamber .context {
+    display: none;
+  }
+  .atlas.solar-page .chamber .view-toolbar {
+    right: 18px;
+    bottom: 22px;
+  }
+}
+
+.solar-mode-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: #0d1e26b3;
+  border: 1px solid #38bdf844;
+  color: #7dd3fc;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  margin-top: 14px;
+  transition: all 0.2s ease;
+  pointer-events: auto;
+}
+
+.solar-mode-switch:hover {
+  background: #14323ec7;
+  border-color: #38bdf888;
+  color: #bae6fd;
+}
+
+.console-shell {
+  transition: height 0.3s ease, transform 0.3s ease;
+  will-change: height, transform;
+}
+
+/* Glass Morph Animation: Visibly shrinks glass when arriving on Solar System */
+.atlas.solar-page .time-panel.glass-morph-shrink .console-shell {
+  animation: glassConsoleMorphShrink 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.atlas.solar-page .time-panel.glass-morph-shrink .time-head {
+  animation: consoleHeadSettle 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.atlas.solar-page .time-panel.glass-morph-shrink .solar-strip {
+  animation: consoleRibbonSettle 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes glassConsoleMorphShrink {
+  0% {
+    transform: scaleY(1.18);
+    transform-origin: 50% 100%;
+  }
+  100% {
+    transform: scaleY(1);
+    transform-origin: 50% 100%;
+  }
+}
+
+@keyframes consoleHeadSettle {
+  0% {
+    transform: translateY(-16px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes consoleRibbonSettle {
+  0% {
+    transform: translateY(-6px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* Glass Morph Animation: Visibly expands glass when returning to Earth / Human Odyssey */
+.time-panel.glass-morph-expand .console-shell {
+  animation: glassConsoleMorphExpand 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.time-panel.glass-morph-expand .time-head {
+  animation: consoleHeadExpand 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes glassConsoleMorphExpand {
+  0% {
+    transform: scaleY(0.85);
+    transform-origin: 50% 100%;
+  }
+  100% {
+    transform: scaleY(1);
+    transform-origin: 50% 100%;
+  }
+}
+
+@keyframes consoleHeadExpand {
+  0% {
+    transform: translateY(16px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* Planetary Ribbon Strip (matching eon-strip in the observatory console) */
+.atlas .time-panel .solar-strip {
+  display: grid;
+  grid-template-columns: 1.3fr repeat(10, 1fr);
+  gap: 2px;
+  margin-top: 12px;
+}
+
+.atlas .time-panel .solar-strip button {
+  background: transparent;
+  border-radius: 0;
+  border: 0;
+  border-top: 1px solid #cdbd954d;
+  color: #b8bba9;
+  padding: 6px 3px 8px;
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  position: relative;
+}
+
+.atlas .time-panel .solar-strip button:hover {
+  color: #f0f2e6;
+  border-top-color: #e4d7be;
+  background: #bad3c60a;
+}
+
+.atlas .time-panel .solar-strip button.active {
+  color: #f5f8ea;
+  border-top: 2px solid #e4e6d2;
+  background: linear-gradient(180deg, #d3c4a218, transparent);
+  box-shadow: inset 0 1px 0 #edd9b533;
+  font-weight: 500;
+}
+
+@media(max-width: 1000px) {
+  .atlas .time-panel .solar-strip {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(205, 189, 149, 0.3) transparent;
+    padding-bottom: 4px;
+  }
+  .atlas .time-panel .solar-strip button {
+    flex: 1 0 auto;
+    min-width: 68px;
+    padding: 6px 8px;
+  }
+}
+

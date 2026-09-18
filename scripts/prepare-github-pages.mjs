@@ -28,6 +28,7 @@ await patchFile('components/earth-globe.tsx', [
 
 await patchFile('app/observatory.css', [
   ["url('/art/observatory-chamber.png')", "url('/AEON/art/observatory-chamber.png')"],
+  ["url('/art/observatory-chamber-transparent.png')", "url('/AEON/art/observatory-chamber-transparent.png')"],
 ]);
 
 console.log(`Prepared static assets for GitHub Pages at ${prefix}`);
