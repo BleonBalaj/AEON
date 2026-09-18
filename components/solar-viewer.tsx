@@ -55,6 +55,17 @@ interface PlanetConfig {
   hasMoon?: boolean;
 }
 
+function resolveAssetPath(url: string | undefined): string {
+  if (!url) return '';
+  if (typeof window !== 'undefined') {
+    const pathname = window.location.pathname;
+    if (pathname.startsWith('/AEON') && !url.startsWith('/AEON/')) {
+      return `/AEON${url.startsWith('/') ? '' : '/'}${url}`;
+    }
+  }
+  return url;
+}
+
 const CELESTIAL_CONFIGS: PlanetConfig[] = [
   {
     id: 'sun',
@@ -424,7 +435,7 @@ export default function SolarViewer({
       let bodyMesh: THREE.Mesh;
 
       if (cfg.id === 'sun') {
-        const sunTex = textureLoader.load(cfg.texture);
+        const sunTex = textureLoader.load(resolveAssetPath(cfg.texture));
         sunTex.colorSpace = THREE.SRGBColorSpace;
 
         // Photosphere: Authentic 2K NASA SDO Photograph with self-illuminating material
@@ -511,9 +522,9 @@ export default function SolarViewer({
         const outerCorona = new THREE.Mesh(outerCoronaGeo, outerCoronaMat);
         bodyContainer.add(outerCorona);
       } else {
-        const diffTex = textureLoader.load(cfg.texture);
+        const diffTex = textureLoader.load(resolveAssetPath(cfg.texture));
         diffTex.colorSpace = THREE.SRGBColorSpace;
-        const bumpTex = cfg.bump ? textureLoader.load(cfg.bump) : null;
+        const bumpTex = cfg.bump ? textureLoader.load(resolveAssetPath(cfg.bump)) : null;
 
         const matOptions: THREE.MeshStandardMaterialParameters = {
           map: diffTex,
@@ -540,7 +551,7 @@ export default function SolarViewer({
       // Clouds (Earth)
       let cloudsMesh: THREE.Mesh | undefined;
       if (cfg.clouds) {
-        const cloudTex = textureLoader.load(cfg.clouds);
+        const cloudTex = textureLoader.load(resolveAssetPath(cfg.clouds));
         cloudTex.colorSpace = THREE.SRGBColorSpace;
         const cloudGeo = new THREE.SphereGeometry(cfg.size * 1.02, 64, 64);
         const cloudMat = new THREE.MeshStandardMaterial({
@@ -566,7 +577,7 @@ export default function SolarViewer({
           v3.fromBufferAttribute(pos, i);
           ringGeo.attributes.uv.setXY(i, (v3.length() - cfg.rings.inner) / (cfg.rings.outer - cfg.rings.inner), 0);
         }
-        const ringTex = textureLoader.load(cfg.rings.texture);
+        const ringTex = textureLoader.load(resolveAssetPath(cfg.rings.texture));
         ringTex.colorSpace = THREE.SRGBColorSpace;
         const ringMat = new THREE.MeshStandardMaterial({
           map: ringTex,
@@ -584,7 +595,7 @@ export default function SolarViewer({
       // Moon (Earth)
       if (cfg.hasMoon) {
         const moonGeo = new THREE.SphereGeometry(0.16, 24, 24);
-        const moonTex = textureLoader.load('/textures/planets/moon.jpg');
+        const moonTex = textureLoader.load(resolveAssetPath('/textures/planets/moon.jpg'));
         moonTex.colorSpace = THREE.SRGBColorSpace;
         const moonMat = new THREE.MeshStandardMaterial({
           map: moonTex,

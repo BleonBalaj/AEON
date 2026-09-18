@@ -31,4 +31,8 @@ await patchFile('app/observatory.css', [
   ["url('/art/observatory-chamber-transparent.png')", "url('/AEON/art/observatory-chamber-transparent.png')"],
 ]);
 
+await patchFile('components/solar-viewer.tsx', [
+  ["'/textures/planets/", "'/AEON/textures/planets/"],
+]);
+
 console.log(`Prepared static assets for GitHub Pages at ${prefix}`);
